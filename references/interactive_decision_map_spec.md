@@ -190,6 +190,8 @@ Minimum useful UI:
 - node cards or bubbles with layer/status/priority visual encoding;
 - visible edges with labels or hover/click labels;
 - filter chips or checkboxes for edge type, layer, priority, and maturity;
+- layer expand/collapse must use a single click or tap; do not require double
+  click for layer navigation;
 - search;
 - selected node panel with incoming/outgoing/blocking relationships;
 - selected edge panel with impact and "if removed" explanation;
@@ -274,6 +276,8 @@ When tool access is limited:
 - Heavy CSS transitions on large transformed graph containers can make panning
   and zoom sluggish.
 - External links opened in a new tab need `rel="noopener noreferrer"`.
+- Double-click layer expansion is too hidden for team discussion. Use single
+  click/tap for layer expand and collapse.
 
 ## Validation Checklist
 
@@ -281,7 +285,8 @@ The final response should only claim success after checking:
 
 - the HTML file exists in `outputs/`;
 - the page renders nonblank in a browser or equivalent renderer;
-- node click, edge click, filters, search, and export work;
+- node click, edge click, single-click layer expand/collapse, filters, search,
+  and export work;
 - no visible text overlap at common desktop and mobile widths;
 - console errors are absent or explicitly documented;
 - review findings have either been fixed or listed as remaining risks.
