@@ -11,21 +11,23 @@ description: |
 
 # Map Product Decisions
 
-## Overview
+## Target Outcome
 
-Produce a single-file interactive HTML UI that maps product or architecture
-decisions as a graph: components are nodes, relationships are typed edges,
-tradeoffs are inspectable, and priorities are editable enough for team debate.
+Given a messy product, architecture, market-structure, or "copy this structure"
+discussion, produce a single-file interactive HTML decision map that a team can
+open, inspect, debate, and use to set priorities.
 
-This skill is for product/architecture thinking artifacts, not end-user UI
-mockups. The goal is to make decision structure explicit enough that a team can
-see what changes when one component, priority, or assumption moves.
+The artifact must model the system as a decision graph: components are nodes,
+relationships are typed edges, and tradeoffs are visible through selected-node
+and selected-edge details. A beautiful static page is not sufficient.
 
-Before producing the artifact, load:
+## Required Resource
 
-- `references/interactive_decision_map_spec.md`
+Load `references/interactive_decision_map_spec.md` before drafting or editing
+the HTML. That file is the output contract for graph schema, UI behavior, edge
+taxonomy, review expectations, and known traps.
 
-## When To Use
+## Trigger Boundary
 
 Use this skill when the user asks to:
 
@@ -40,10 +42,18 @@ Use this skill when the user asks to:
 - build an internal discussion surface for founders, product, engineering,
   security, or strategy review.
 
-Do not use this skill for a static PPT-style deck, a marketing landing page, or
-a pure written analysis unless the user explicitly asks for that instead.
+Do not use this skill for:
 
-## Required Output
+- a static PPT-style deck;
+- a marketing landing page;
+- end-user UI/UX mockups;
+- pure written analysis with no artifact;
+- a normal code review or implementation task.
+
+If the user explicitly asks for one of those outputs, respect the request and do
+not force the decision-map format.
+
+## Output Contract
 
 The primary output is a single HTML file in the current project's `outputs/`
 directory, named with a clear slug such as:
@@ -57,9 +67,7 @@ project already requires a dev server. Prefer no external runtime dependency for
 the artifact. If an external library is used, explain why and preserve a local or
 graceful fallback.
 
-## Artifact Contract
-
-The artifact must include all of the following:
+The artifact must include:
 
 - A graph model with `nodes[]` and `edges[]`, not only nested sections.
 - Typed, labeled relationships between components.
@@ -75,7 +83,7 @@ The artifact must include all of the following:
   and agentic-loop concerns.
 - Responsive layout that works on desktop and mobile without text overlap.
 
-## Analysis Expectations
+## Reasoning Quality Bar
 
 Model the structure as a decision system, not a sitemap. A useful map should make
 these questions answerable from the UI:
@@ -101,6 +109,27 @@ available. Split them by concern, not by file:
 Synthesize disagreements into the graph itself. Do not merely append reviewer
 comments below the artifact.
 
+## Resources And Boundaries
+
+Usable resources:
+
+- Existing decks, notes, docs, HTML artifacts, code, and local project files.
+- Web or GitHub research when the user asks to learn from current UI repos,
+  libraries, or market examples.
+- Parallel subagents for broad, uncertain, or adversarial architecture work.
+- Browser QA tools for checking the generated HTML.
+
+Boundaries:
+
+- Do not invent precise facts about current libraries, protocols, laws, or
+  vendor capabilities when they matter; verify current information first.
+- Do not hide important uncertainty in confident node labels. Put uncertainty in
+  `openQuestions`, `risks`, or review findings.
+- Do not move private strategy, credentials, or unpublished user material to
+  external tools unless the user has authorized it.
+- Do not let UI polish replace architecture quality. A decision map with missing
+  edges has failed even if it looks good.
+
 ## Domain Defaults From The AICX Session
 
 When the product resembles an exchange, marketplace, protocol, or AI-output
@@ -121,6 +150,18 @@ market, carry these defaults unless the user overrides them:
 - Separate "can be automated" from "should be automated." Escalation, kill
   switches, auditability, and human sign-off should be first-class nodes.
 
+These defaults are examples of reusable product judgment, not hardcoded AICX
+requirements. Adapt them to the domain rather than copying labels blindly.
+
+## Failure Handling
+
+If a browser check, subagent run, network lookup, or external review tool is not
+available, still produce the HTML artifact and mark the missing verification in
+the final response. Missing optional tools is not a reason to return only prose.
+
+If source material is thin, build the graph around explicit assumptions and open
+questions. Do not fabricate certainty to make the map look complete.
+
 ## Acceptance Criteria
 
 The skill run is complete only when:
@@ -137,3 +178,5 @@ The skill run is complete only when:
    nonblank output, layout sanity, clickability, and console errors.
 8. Any adversarial review findings are either fixed or called out as remaining
    risks in the final response.
+9. The final response includes the artifact path and a concise verification
+   summary.

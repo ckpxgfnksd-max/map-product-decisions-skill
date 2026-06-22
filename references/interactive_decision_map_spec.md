@@ -12,6 +12,17 @@ The artifact should let a team inspect components, traverse relationships,
 change priorities, record decisions, and see which choices affect other parts of
 the product or architecture.
 
+## Non-Negotiable Result Properties
+
+- The artifact is interactive HTML, not slides, markdown, or a static image.
+- The data model has explicit `nodes[]`, `edges[]`, `decisions[]`, and
+  `reviews[]`.
+- Every nontrivial component relationship is represented as an edge.
+- Selection state changes visible details in the UI.
+- Team discussion state can be captured and exported.
+- Review findings change the map or appear as linked risks; they are not buried
+  as unstructured prose.
+
 ## Recommended Graph Schema
 
 Embed the data directly in the HTML as JavaScript objects unless the project has
@@ -74,6 +85,45 @@ const model = {
 
 Keep IDs stable, lowercase, and hyphenated. The UI should use IDs, not display
 text, as references.
+
+## Required Field Semantics
+
+Node fields:
+
+- `id`: stable machine key, lowercase hyphenated.
+- `title`: human-readable label.
+- `layer`: architectural or product layer.
+- `priority`: current sequencing recommendation.
+- `maturity`: assumption/design/prototype/validated/etc.
+- `owner`: likely accountable function or actor.
+- `summary`: one or two sentences explaining the node's role.
+- `decisions`: concrete choices attached to this node.
+- `risks`: failure modes, unknowns, or coupling hazards.
+- `interfaces`: APIs, events, contracts, packets, handoffs, or governance
+  boundaries exposed by the node.
+- `openQuestions`: questions the team must answer later.
+
+Edge fields:
+
+- `id`: stable machine key.
+- `from` and `to`: valid node IDs.
+- `type`: one of the edge taxonomy values or a domain-specific extension.
+- `label`: short visible label.
+- `strength`: low/medium/high or equivalent.
+- `impact`: why this relationship matters.
+- `ifRemoved`: what breaks, gets cheaper, or changes if the relationship is
+  removed.
+
+Decision fields:
+
+- `id`, `title`, `status`, `priority`, and `affects`.
+- `status` should distinguish proposed, accepted, rejected, blocked, and needs
+  review.
+
+Review fields:
+
+- `area`, `finding`, `severity`, and `linkedNodes`.
+- Review findings should be traceable back to graph elements.
 
 ## Node Taxonomy
 
@@ -148,6 +198,9 @@ Minimum useful UI:
 - reset/clear saved decisions button;
 - review/risk panel.
 
+The HTML should also expose enough state in the DOM or JavaScript model that a
+future agent can revise the artifact without reverse-engineering visual layout.
+
 Prefer familiar controls: icon buttons for zoom/reset/export where available,
 checkboxes/toggles for filters, tabs for graph vs review if the surface is
 crowded. Do not hide relationship meaning behind decoration.
@@ -189,6 +242,19 @@ For web3 or settlement-aware architectures, also ask:
 - Which interfaces need EVM-compatible semantics now?
 - Where do ZK, ZKML, FHE, TEEs, selective disclosure, and auditability attach?
 - Which proof boundary can survive implementation swaps?
+
+## Degraded Mode
+
+When tool access is limited:
+
+- If browser QA is unavailable, inspect the HTML/CSS/JS statically and say that
+  browser verification was not run.
+- If subagents are unavailable, run independent self-review passes with explicit
+  headings and merge findings into the graph.
+- If current GitHub/UI research is blocked, avoid claiming current best practice
+  and rely on local patterns or previously verified examples.
+- If source material is incomplete, use assumption and open-question fields
+  rather than filling gaps with invented certainty.
 
 ## Known Traps From The AICX Session
 
