@@ -209,14 +209,67 @@ crowded. Do not hide relationship meaning behind decoration.
 
 ## Visual Style
 
-Use the prior AICX artifact style as the baseline: calm, serious, internal-team
-tooling; not PPT slides, not marketing. It can borrow the polish of a deck, but
-it must operate as a discussion UI.
+Use `ckpxgfnksd-max/guizang-ppt-skill`
+(https://github.com/ckpxgfnksd-max/guizang-ppt-skill) as the visual style
+source. Borrow its single-file HTML discipline, editorial polish, typography,
+grid logic, curated themes, and high-contrast presentation quality.
+
+Do not borrow its horizontal slide/deck interaction. This artifact is a
+continuous interactive decision map with graph navigation, layer expansion,
+filters, detail panels, and editable decision state.
+
+### Guizang Style Adapter
+
+Default for product/architecture maps: Guizang Swiss International style.
+
+- Use a strict modular grid, ideally 12 or 16 columns.
+- Use Inter / Helvetica Neue / Noto Sans SC for the main UI and JetBrains Mono
+  or an equivalent mono face for IDs, metadata, node counts, and edge labels.
+- Use a light paper background, near-black ink, calibrated greys, and a single
+  high-saturation accent. Default accent: IKB blue `#002FA7`.
+- Use the accent sparingly for selected nodes, active filters, key counts,
+  active edge paths, and high-priority decisions.
+- Use hairline dividers, rectangular panels, minimal shadows, and tight
+  alignment. Cards and panels should feel like information surfaces, not
+  marketing cards.
+- Favor large, thin strategic labels for map headings and compact semibold
+  metadata labels for controls.
+- Use dot-matrix, fine-grid, rule-line, or mono-index details as subtle texture
+  only when they do not compete with graph readability.
+
+Optional for strategy/narrative maps: Guizang electronic magazine style.
+
+- Use warm paper/ink palettes and a stronger editorial title treatment.
+- Serif headings are acceptable for narrative sections, but controls and graph
+  labels should stay readable and mostly sans-serif.
+- Fluid or contour backgrounds may appear only as passive atmosphere outside the
+  graph interaction area; they must not reduce performance or readability.
+
+Theme defaults:
+
+```css
+:root {
+  --paper: #fafaf8;
+  --ink: #0a0a0a;
+  --grey-1: #f0f0ee;
+  --grey-2: #d4d4d2;
+  --grey-3: #737373;
+  --accent: #002FA7;
+  --accent-on: #ffffff;
+  --line: rgba(10, 10, 10, 0.14);
+}
+```
+
+For Swiss style, keep one accent color per artifact. Do not mix IKB, lemon
+yellow, lemon green, and safety orange in the same map as peer accents. Different
+layers should be distinguished primarily by layout, labels, line style, icons,
+or subtle tints, not by turning the UI into a rainbow.
 
 Avoid:
 
 - a one-direction hierarchy with no cross-links;
 - huge hero sections;
+- horizontal slide pagination or deck chrome;
 - decorative cards inside cards;
 - text explaining how to use the UI inside the artifact;
 - generic SaaS landing page visuals;
@@ -285,6 +338,7 @@ The final response should only claim success after checking:
 
 - the HTML file exists in `outputs/`;
 - the page renders nonblank in a browser or equivalent renderer;
+- the UI follows Guizang-derived style rules without horizontal deck pagination;
 - node click, edge click, single-click layer expand/collapse, filters, search,
   and export work;
 - no visible text overlap at common desktop and mobile widths;

@@ -27,6 +27,18 @@ Load `references/interactive_decision_map_spec.md` before drafting or editing
 the HTML. That file is the output contract for graph schema, UI behavior, edge
 taxonomy, review expectations, and known traps.
 
+## Visual Style Source
+
+The UI style should inherit from `ckpxgfnksd-max/guizang-ppt-skill`
+(https://github.com/ckpxgfnksd-max/guizang-ppt-skill), but the artifact must
+remain an interactive decision map, not a horizontal swipe deck.
+
+Default to the Guizang Swiss International style for product, architecture,
+engineering, data, and protocol maps: strict grid, high contrast, restrained
+accent color, hairline dividers, strong type hierarchy, and information-dense
+panels. Use the Guizang electronic magazine style only when the map is more
+strategy/narrative/culture than technical architecture.
+
 ## Trigger Boundary
 
 Use this skill when the user asks to:
@@ -129,6 +141,8 @@ Boundaries:
   external tools unless the user has authorized it.
 - Do not let UI polish replace architecture quality. A decision map with missing
   edges has failed even if it looks good.
+- Do not copy the horizontal deck interaction model from Guizang. Borrow the
+  visual language and single-file HTML discipline, not the slide format.
 
 ## Domain Defaults From The AICX Session
 
@@ -174,9 +188,11 @@ The skill run is complete only when:
 5. Internal agentic loops are represented as internal operating/control loops,
    including safety review where relevant.
 6. The artifact includes team-priority and decision-capture affordances.
-7. The artifact has been checked in a browser or equivalent rendering path for
+7. The artifact uses the Guizang-derived visual language without becoming a
+   horizontal slide deck.
+8. The artifact has been checked in a browser or equivalent rendering path for
    nonblank output, layout sanity, clickability, and console errors.
-8. Any adversarial review findings are either fixed or called out as remaining
+9. Any adversarial review findings are either fixed or called out as remaining
    risks in the final response.
-9. The final response includes the artifact path and a concise verification
+10. The final response includes the artifact path and a concise verification
    summary.
