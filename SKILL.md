@@ -41,10 +41,16 @@ Before drafting the HTML, write a short internal design note with:
 - why that grammar fits the source material;
 - what should be represented as sequential gates;
 - what can be represented as parallel workstreams;
-- what vocabulary must be preserved or explicitly excluded from the source.
+- what vocabulary must be preserved or explicitly excluded from the source;
+- whether the map is likely to exceed one viewport and therefore needs fit/zoom
+  and collapsible panels from the first draft;
+- how selection state should behave when filters, tabs, or collapsed panels hide
+  the currently selected node or edge.
 
 If the source material changes during the conversation, reassess the grammar
-instead of continuing with the previous layout.
+instead of continuing with the previous layout. If the user reports that the
+artifact feels chaotic, first question whether the chosen grammar or viewport
+controls are wrong before adding more nodes.
 
 ## Visual Style Source
 
@@ -118,6 +124,13 @@ The artifact must include:
 - A visible review or risk panel covering product, engineering, security/privacy,
   and agentic-loop concerns.
 - Responsive layout that works on desktop and mobile without text overlap.
+- For large maps, controls to inspect both detail and overview: collapsible left
+  and right panels, fit-to-view, zoom in/out, and reset zoom. These controls are
+  required when the graph cannot fit alongside both sidebars at common desktop
+  widths.
+- Interaction-state consistency: filters, search, tab switches, collapsed
+  panels, and hidden nodes must not leave the UI focused on an invisible or
+  stale node/edge.
 
 ## Reasoning Quality Bar
 
@@ -172,7 +185,10 @@ Pick the grammar that makes the dominant decision structure obvious:
 
 Hybrid maps are allowed, but the main grammar must stay visually dominant. For
 example, a stage-gated roadmap may include dependency edges, but the timeline
-spine and gates should remain more legible than the dependency mesh.
+spine and gates should remain more legible than the dependency mesh. For large
+stage or swimlane maps, reserve screen real estate for the primary grammar:
+sidebars should be collapsible and a fit-to-view control should expose the full
+spine without requiring manual horizontal scrolling first.
 
 ### Source Vocabulary Discipline
 
@@ -214,6 +230,9 @@ Boundaries:
   individually correct.
 - Do not copy the horizontal deck interaction model from Guizang. Borrow the
   visual language and single-file HTML discipline, not the slide format.
+- Do not ship a map where the first useful view is trapped between permanent
+  sidebars. If the graph is wider than the available viewport, include overview
+  controls and collapsible panels so the team can see the whole structure.
 
 ## Domain Defaults From The AICX Session
 
@@ -265,11 +284,15 @@ The skill run is complete only when:
 8. The artifact includes team-priority and decision-capture affordances.
 9. The artifact uses the Guizang-derived visual language without becoming a
    horizontal slide deck.
-10. The artifact has been checked in a browser or equivalent rendering path for
+10. For large maps, side panels are collapsible and fit/zoom controls let the
+    user see the full map overview.
+11. Filter, search, tab, collapse, and zoom interactions keep selection state
+    coherent; the detail panel never points at a hidden stale node or edge.
+12. The artifact has been checked in a browser or equivalent rendering path for
    nonblank output, layout sanity, clickability, and console errors.
-11. The final vocabulary pass found no imported terms from adjacent projects or
+13. The final vocabulary pass found no imported terms from adjacent projects or
     earlier drafts unless explicitly intended.
-12. Any adversarial review findings are either fixed or called out as remaining
+14. Any adversarial review findings are either fixed or called out as remaining
    risks in the final response.
-13. The final response includes the artifact path and a concise verification
+15. The final response includes the artifact path and a concise verification
    summary.

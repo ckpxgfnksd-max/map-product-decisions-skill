@@ -309,14 +309,42 @@ Minimum useful UI:
 - priority editor or decision notes saved to `localStorage`;
 - export JSON button;
 - reset/clear saved decisions button;
-- review/risk panel.
+- review/risk panel;
+- for large maps, collapsible left/right panels plus fit-to-view, zoom in/out,
+  and zoom reset controls;
+- coherent selection behavior after filters, search, tab switches, panel
+  collapse, or zoom changes. If the selected node or edge becomes hidden, the UI
+  should clear the stale edge selection or move to the first visible node.
 
 The HTML should also expose enough state in the DOM or JavaScript model that a
 future agent can revise the artifact without reverse-engineering visual layout.
 
 Prefer familiar controls: icon buttons for zoom/reset/export where available,
 checkboxes/toggles for filters, tabs for graph vs review if the surface is
-crowded. Do not hide relationship meaning behind decoration.
+crowded. For large maps, include an explicit overview affordance: fit-to-view
+and collapsible side panels are the default. Do not hide relationship meaning
+behind decoration.
+
+### Interaction And Viewport Requirements
+
+Large decision maps fail when the graph is technically correct but practically
+uninspectable. Apply these rules before finalizing:
+
+- If the map is wider or taller than the central viewport with side panels open,
+  provide fit-to-view, zoom in/out, and reset zoom controls.
+- Left filter/navigation and right detail/review panels must be collapsible when
+  the full map cannot be seen comfortably on a desktop viewport.
+- Tabs such as Map and Review should be mutually clear. Avoid showing stale node
+  details and review content as if both are active at once.
+- Filter/search actions must keep selection state coherent. A detail panel must
+  not keep describing a node or edge that has become hidden by the current
+  filters.
+- Repeated controls created from stages, lanes, layers, or headings must have
+  unique coordinates or layout slots. Duplicate positions are a visible bug.
+- Node cards should have stable dimensions or measured anchors. Variable-height
+  summaries can create visual overlap and edge-anchor drift.
+- Edge layers must be tested for actual clickability. SVG parent layers with
+  disabled pointer events can swallow child path/label interactions.
 
 ## Visual Style
 
@@ -456,6 +484,13 @@ When tool access is limited:
   Check for duplicate positions in timeline/swimlane layouts.
 - Variable-height cards can make edge anchors visually drift. Use stable card
   dimensions or compute anchors from measured boxes.
+- Permanent sidebars can make a correct large map feel broken because the user
+  cannot see the whole structure. Add collapsible sidebars and fit-to-view.
+- Filter and tab clicks can create stale UI: the detail panel may continue to
+  describe a hidden node or an inactive view. Reconcile selection state after
+  every filter/search/tab/collapse action.
+- Top toolbars can overlap map content on narrow desktop widths. Let controls
+  wrap and keep the graph shell below the toolbar's actual height.
 - Heavy CSS transitions on large transformed graph containers can make panning
   and zoom sluggish.
 - External links opened in a new tab need `rel="noopener noreferrer"`.
@@ -474,6 +509,10 @@ The final response should only claim success after checking:
 - the UI follows Guizang-derived style rules without horizontal deck pagination;
 - node click, edge click, single-click layer expand/collapse, filters, search,
   and export work;
+- for large maps, left/right panel collapse, fit-to-view, zoom in/out, and zoom
+  reset work;
+- filter/search/tab/collapse actions do not leave detail panels pointing at
+  hidden stale nodes or edges;
 - SVG edges and edge labels are actually clickable;
 - repeated stage/lane/heading controls do not overlap at duplicate coordinates;
 - no visible text overlap at common desktop and mobile widths;
