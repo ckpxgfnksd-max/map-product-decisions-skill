@@ -12,11 +12,19 @@ The artifact should let a team inspect components, traverse relationships,
 change priorities, record decisions, and see which choices affect other parts of
 the product or architecture.
 
+The artifact's visual grammar must match the source material. A component graph
+is only one possible grammar. If the discussion is about timing, readiness,
+rollout, or "after this gate, then that stage," the map should be a stage-gated
+roadmap or swimlane operating map. If the discussion is about alternative
+choices, the map should emphasize options and criteria. If the discussion is
+about feedback loops, the loop should be visible as the primary structure.
+
 ## Non-Negotiable Result Properties
 
 - The artifact is interactive HTML, not slides, markdown, or a static image.
 - The data model has explicit `nodes[]`, `edges[]`, `decisions[]`, and
   `reviews[]`.
+- The model declares `meta.mapGrammar` and the UI layout follows it.
 - Every nontrivial component relationship is represented as an edge.
 - Selection state changes visible details in the UI.
 - Team discussion state can be captured and exported.
@@ -34,6 +42,7 @@ const model = {
     title: "AICX Architecture Decision Map",
     generatedAt: "2026-06-22",
     version: 1,
+    mapGrammar: "dependency-graph",
     sourceNotes: []
   },
   nodes: [
@@ -86,6 +95,49 @@ const model = {
 Keep IDs stable, lowercase, and hyphenated. The UI should use IDs, not display
 text, as references.
 
+For stage-gated or swimlane maps, add explicit stage/lane arrays while keeping
+`nodes[]` and `edges[]` as the canonical graph:
+
+```js
+const model = {
+  meta: {
+    title: "AICX Market Launch Stage Map",
+    generatedAt: "2026-06-24",
+    version: 1,
+    mapGrammar: "stage-gated-roadmap",
+    sourceNotes: []
+  },
+  stages: [
+    { id: "stage-1", title: "Closed RFQ", order: 1, gate: false },
+    { id: "gate-1", title: "Market Proof", order: 2, gate: true }
+  ],
+  lanes: [
+    { id: "demand", title: "Demand Proof" },
+    { id: "supply", title: "Supply Proof" }
+  ],
+  nodes: [
+    {
+      id: "repeat-buyer-score",
+      title: "Repeat Buyer Score",
+      stage: "gate-1",
+      lane: "demand",
+      layer: "data",
+      priority: "gate",
+      maturity: "design",
+      owner: "data science",
+      summary: "Blocks open market access until recurring demand is proven.",
+      decisions: ["Require repeat buyer threshold before opening"],
+      risks: ["GMV can rise while repeat demand remains absent"],
+      interfaces: ["DemandScore"],
+      openQuestions: ["What is the minimum repeat rate?"]
+    }
+  ],
+  edges: [],
+  decisions: [],
+  reviews: []
+};
+```
+
 ## Required Field Semantics
 
 Node fields:
@@ -102,6 +154,9 @@ Node fields:
 - `interfaces`: APIs, events, contracts, packets, handoffs, or governance
   boundaries exposed by the node.
 - `openQuestions`: questions the team must answer later.
+- `stage` / `lane` / `stream`: optional but recommended when the selected
+  grammar is time-based or operating-model-based. If present, filters and layout
+  should expose them.
 
 Edge fields:
 
@@ -159,6 +214,56 @@ Common maturity values:
 - mature
 - blocked
 
+## Map Grammar Taxonomy
+
+Choose the map grammar before laying out nodes. The model should include the
+chosen grammar in `model.meta.mapGrammar`.
+
+### `dependency-graph`
+
+Use when the source is primarily about components, interfaces, blockers,
+ownership, and coupling. Layout can be clustered by layer or subsystem. Cross
+links are expected. Avoid using this grammar for rollout plans where the main
+question is sequence.
+
+### `stage-gated-roadmap`
+
+Use when the source is primarily about time, maturity, milestones, launch order,
+readiness thresholds, or "only after X can we do Y." The main stages should form
+a clearly ordered spine. Gates should be first-class nodes or stage objects, and
+edge types like `sequence`, `blocks`, `feeds`, and `audits` should show why a
+stage can or cannot advance. Parallel workstreams should be visually separated
+from the spine.
+
+### `swimlane-operating-map`
+
+Use when multiple workstreams move in parallel: product, engineering, data,
+risk, compliance, supply, agentic ops, etc. Rows or columns should make
+parallelism obvious. Cross-lane edges should show handoffs and constraints.
+
+### `decision-tree`
+
+Use when the main structure is conditional branching or go/no-go logic. Nodes
+should include decision conditions, required evidence, and consequences. Edges
+should be labeled by conditions, not generic dependency labels.
+
+### `option-tradeoff-map`
+
+Use when the team is comparing alternatives. Model options, criteria,
+constraints, risks, and consequences as distinct nodes. Edges should show which
+criteria support, reject, or constrain each option.
+
+### `system-loop-map`
+
+Use when the source is primarily about feedback loops, flywheels, monitoring, or
+agentic iteration. The loop should be visible as the dominant structure, with
+control points, escalation points, and failure modes attached.
+
+Hybrid maps are allowed, but the primary grammar must remain visually dominant.
+A stage-gated roadmap may include dependency edges; a dependency graph may
+include a small rollout lane. Do not let the secondary grammar obscure the main
+decision structure.
+
 ## Edge Taxonomy
 
 Every important relationship should be an edge. Avoid treating a parent/child
@@ -179,6 +284,8 @@ Recommended edge types:
 - `escalates_to`: source hands uncertainty or risk to target.
 - `competes_with`: source creates a strategic alternative or tension.
 - `outsources`: source should use an external mature component.
+- `sequence`: source happens before target in an ordered process.
+- `gates`: source is a milestone or threshold target must pass.
 
 Give each edge a short label plus a longer `impact` or `ifRemoved` explanation.
 
@@ -189,7 +296,11 @@ Minimum useful UI:
 - full-screen or split-screen graph area plus detail panel;
 - node cards or bubbles with layer/status/priority visual encoding;
 - visible edges with labels or hover/click labels;
-- filter chips or checkboxes for edge type, layer, priority, and maturity;
+- filter chips or checkboxes matched to the grammar:
+  - dependency graph: layer, priority, maturity, edge type;
+  - stage-gated roadmap: stage, workstream/lane, status, edge type;
+  - option map: option, criterion, status, edge type;
+  - loop map: loop phase, control type, status, edge type;
 - layer expand/collapse must use a single click or tap; do not require double
   click for layer navigation;
 - search;
@@ -283,6 +394,10 @@ simulate separate passes with clear separation and then merge findings.
 
 The review should ask:
 
+- Is the chosen `mapGrammar` right for the source material?
+- Is the main visual structure showing sequence, dependency, options, or loops
+  according to the actual discussion?
+- Are sequential gates visually separated from parallel workstreams?
 - What critical relationship is missing?
 - What decision is being treated as reversible but is actually expensive?
 - What mature component should be bought or isolated instead of reinvented?
@@ -316,6 +431,15 @@ When tool access is limited:
 - Static PPT-like HTML is a failure mode. The artifact must be interactive.
 - A tree is insufficient. Component relationships and decision impacts require
   typed `edges[]`.
+- Defaulting to a dense component graph is a failure when the source material is
+  primarily a staged rollout, cold start path, maturity model, or readiness-gate
+  discussion. Use `stage-gated-roadmap` or `swimlane-operating-map` instead.
+- Mixing sequential milestones and parallel workstreams in one undifferentiated
+  graph makes the artifact hard to use. Time/gates belong on the spine;
+  workstreams belong in lanes.
+- Do not import domain terms from adjacent projects or earlier drafts. In the
+  AICX cold-start discussion, bringing in unrelated token names created a false
+  product primitive. Preserve only the current source vocabulary.
 - Matching/trading infrastructure should often be isolated as a mature market
   component, not mixed into differentiated product logic.
 - Future settlement cannot be hand-waved. If on-chain migration is plausible,
@@ -326,6 +450,12 @@ When tool access is limited:
   this workflow, not end-user UI automation.
 - `localStorage.setItem` can fail; catch persistence errors.
 - Filtered or dimmed edges should not remain misleadingly clickable.
+- SVG edge layers with `pointer-events: none` can make edges and edge labels
+  unclickable even when child elements set pointer events. Verify edge clicks.
+- Reused heading or lane coordinates can stack controls on top of each other.
+  Check for duplicate positions in timeline/swimlane layouts.
+- Variable-height cards can make edge anchors visually drift. Use stable card
+  dimensions or compute anchors from measured boxes.
 - Heavy CSS transitions on large transformed graph containers can make panning
   and zoom sluggish.
 - External links opened in a new tab need `rel="noopener noreferrer"`.
@@ -337,10 +467,17 @@ When tool access is limited:
 The final response should only claim success after checking:
 
 - the HTML file exists in `outputs/`;
+- `model.meta.mapGrammar` exists and the layout matches it;
+- for time-based maps, sequential gates and parallel workstreams are visually
+  distinct;
 - the page renders nonblank in a browser or equivalent renderer;
 - the UI follows Guizang-derived style rules without horizontal deck pagination;
 - node click, edge click, single-click layer expand/collapse, filters, search,
   and export work;
+- SVG edges and edge labels are actually clickable;
+- repeated stage/lane/heading controls do not overlap at duplicate coordinates;
 - no visible text overlap at common desktop and mobile widths;
+- vocabulary search finds no imported terms from adjacent projects unless
+  explicitly intended;
 - console errors are absent or explicitly documented;
 - review findings have either been fixed or listed as remaining risks.
