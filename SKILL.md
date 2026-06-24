@@ -35,6 +35,11 @@ Load `references/interactive_decision_map_spec.md` before drafting or editing
 the HTML. That file is the output contract for graph schema, UI behavior, edge
 taxonomy, review expectations, and known traps.
 
+For source-heavy, research-heavy, or multi-revision maps, also load
+`references/source_quality_pipeline.md`. Use it to separate facts, inferred
+patterns, time-bounded snapshots, open questions, source references, and decision
+backfill before modeling the graph.
+
 Before drafting the HTML, write a short internal design note with:
 
 - chosen map grammar;
@@ -42,6 +47,10 @@ Before drafting the HTML, write a short internal design note with:
 - what should be represented as sequential gates;
 - what can be represented as parallel workstreams;
 - what vocabulary must be preserved or explicitly excluded from the source;
+- which source claims are facts, which are inferred patterns, which are
+  snapshots, and which remain open questions;
+- whether nodes, edges, reviews, and decisions need `sourceRefs`, `assumption`,
+  or `openQuestions` fields to avoid unsupported certainty;
 - whether the map is likely to exceed one viewport and therefore needs fit/zoom
   and collapsible panels from the first draft;
 - which edge classes should be visible by default, which should appear only on
@@ -109,9 +118,18 @@ project already requires a dev server. Prefer no external runtime dependency for
 the artifact. If an external library is used, explain why and preserve a local or
 graceful fallback.
 
+When possible, start from `assets/decision-map-seed.html` rather than a blank
+file. The seed provides Guizang Swiss tokens, a split-screen map shell,
+fit/zoom/export/line-density controls, stable graph slots, and a canonical
+`model` placeholder. Replace the model and interaction logic instead of
+preserving placeholder content.
+
 The artifact must include:
 
 - A graph model with `nodes[]` and `edges[]`, not only nested sections.
+- For source-backed maps, `sources[]` plus `sourceRefs` on non-obvious nodes,
+  edges, decisions, and reviews, or explicit `assumption` / `openQuestions`
+  fields when evidence is incomplete.
 - A declared map grammar in `model.meta.mapGrammar`, such as
   `dependency-graph`, `stage-gated-roadmap`, `swimlane-operating-map`,
   `decision-tree`, `option-tradeoff-map`, or `system-loop-map`.
@@ -125,6 +143,8 @@ The artifact must include:
   evaluation criterion, and decision status for a tradeoff map.
 - An editable or persistable team-discussion layer for priorities, notes, or
   decisions. `localStorage` is acceptable, but failures must be handled.
+- When the map is expected to evolve, a compact decision ledger such as
+  `decisionLedger[]` or an equivalent persisted decision log.
 - Export of the current decision state as JSON.
 - A visible review or risk panel covering product, engineering, security/privacy,
   and agentic-loop concerns.
@@ -267,6 +287,10 @@ Before finalizing, run a vocabulary pass:
   adjacent project, or model inference;
 - search the HTML for forbidden terms.
 
+Also run a copy-quality pass for artifact text. Remove throat-clearing,
+performative labels, vague risk statements, and decorative one-liners. The map
+is a decision interface; labels should be direct and specific.
+
 ## Resources And Boundaries
 
 Usable resources:
@@ -334,6 +358,16 @@ the final response. Missing optional tools is not a reason to return only prose.
 If source material is thin, build the graph around explicit assumptions and open
 questions. Do not fabricate certainty to make the map look complete.
 
+If `scripts/validate_decision_map.mjs` is available, run it against the HTML
+before browser QA. Resolve the script path relative to this skill folder:
+
+```bash
+node scripts/validate_decision_map.mjs outputs/<topic>_decision_map.html
+```
+
+Treat failures as blockers. Treat warnings as review prompts: fix them when they
+signal real issues, or mention the remaining limitation in the final response.
+
 ## Acceptance Criteria
 
 The skill run is complete only when:
@@ -362,11 +396,15 @@ The skill run is complete only when:
     and labels do not clutter the overview.
 13. Filter, search, tab, collapse, and zoom interactions keep selection state
     coherent; the detail panel never points at a hidden stale node or edge.
-14. The artifact has been checked in a browser or equivalent rendering path for
+14. Static validation has been run with `validate_decision_map.mjs` when the
+    script is available, and failures have been fixed.
+15. The artifact has been checked in a browser or equivalent rendering path for
    nonblank output, layout sanity, clickability, and console errors.
-15. The final vocabulary pass found no imported terms from adjacent projects or
+16. The final vocabulary pass found no imported terms from adjacent projects or
     earlier drafts unless explicitly intended.
-16. Any adversarial review findings are either fixed or called out as remaining
+17. Source-backed maps preserve provenance: unsupported claims are marked as
+    assumptions or open questions rather than presented as facts.
+18. Any adversarial review findings are either fixed or called out as remaining
    risks in the final response.
-17. The final response includes the artifact path and a concise verification
+19. The final response includes the artifact path and a concise verification
    summary.

@@ -24,6 +24,8 @@ about feedback loops, the loop should be visible as the primary structure.
 - The artifact is interactive HTML, not slides, markdown, or a static image.
 - The data model has explicit `nodes[]`, `edges[]`, `decisions[]`, and
   `reviews[]`.
+- Source-heavy maps include `sources[]` and use `sourceRefs`, `assumption`, or
+  `openQuestions` to distinguish evidence-backed claims from inference.
 - The model declares `meta.mapGrammar` and the UI layout follows it.
 - Every nontrivial component relationship is represented as an edge.
 - Dense maps may hide secondary edges in the default view, but the hidden edges
@@ -47,6 +49,16 @@ const model = {
     mapGrammar: "dependency-graph",
     sourceNotes: []
   },
+  sources: [
+    {
+      id: "s1",
+      label: "Founder notes",
+      type: "notes",
+      status: "provided",
+      claims: ["settlement constraints", "privacy boundary"],
+      vocabulary: ["SettlementEvent", "ProofPacket"]
+    }
+  ],
   nodes: [
     {
       id: "settlement-layer",
@@ -59,7 +71,8 @@ const model = {
       decisions: ["Keep event schema EVM-compatible from day one"],
       risks: ["Retrofit cost if off-chain state is not canonical"],
       interfaces: ["SettlementEvent", "ProofPacket"],
-      openQuestions: ["Which state transitions require on-chain finality?"]
+      openQuestions: ["Which state transitions require on-chain finality?"],
+      sourceRefs: ["s1"]
     }
   ],
   edges: [
@@ -71,7 +84,8 @@ const model = {
       label: "event schema",
       strength: "high",
       impact: "Settlement event design constrains future contract interfaces.",
-      ifRemoved: "On-chain migration becomes a rewrite instead of a settlement adapter."
+      ifRemoved: "On-chain migration becomes a rewrite instead of a settlement adapter.",
+      sourceRefs: ["s1"]
     }
   ],
   decisions: [
@@ -181,6 +195,18 @@ Review fields:
 
 - `area`, `finding`, `severity`, and `linkedNodes`.
 - Review findings should be traceable back to graph elements.
+
+Source fields:
+
+- `id`, `label`, `type`, `status`, `claims`, and `vocabulary`.
+- Use `sourceRefs` on graph elements when provenance affects trust.
+- Use `assumption` or `openQuestions` instead of writing unsupported inference
+  as fact.
+
+Decision ledger fields, when used:
+
+- `id`, `date`, `status`, `decision`, `evidence`, `affects`, and `revisitWhen`.
+- Use it when the map should continue across multiple team discussions.
 
 ## Node Taxonomy
 
@@ -309,6 +335,8 @@ Minimum useful UI:
 - selected node panel with incoming/outgoing/blocking relationships;
 - selected edge panel with impact and "if removed" explanation;
 - priority editor or decision notes saved to `localStorage`;
+- optional decision ledger when the map is expected to evolve across sessions;
+- source notes or source filters when provenance changes confidence;
 - export JSON button;
 - reset/clear saved decisions button;
 - review/risk panel;
@@ -437,6 +465,12 @@ Theme defaults:
 }
 ```
 
+The skill includes `assets/decision-map-seed.html` as a minimal starting point
+for Guizang Swiss decision maps. Use it when the current project has no stronger
+local scaffold. The seed provides stable CSS tokens, responsive panel layout,
+edge-mode controls, fit/zoom/export affordances, and the canonical model slot so
+agents do not repeatedly rebuild the same shell.
+
 For Swiss style, keep one accent color per artifact. Do not mix IKB, lemon
 yellow, lemon green, and safety orange in the same map as peer accents. Different
 layers should be distinguished primarily by layout, labels, line style, icons,
@@ -504,9 +538,22 @@ When tool access is limited:
 - If source material is incomplete, use assumption and open-question fields
   rather than filling gaps with invented certainty.
 
+If static validation is available, run:
+
+```bash
+node scripts/validate_decision_map.mjs outputs/<topic>_decision_map.html
+```
+
+This check does not replace browser QA. It catches missing model fields,
+unguarded persistence, missing line-density controls, missing zoom/fit controls,
+and common visual-style hazards before visual inspection.
+
 ## Known Traps From The AICX Session
 
 - Static PPT-like HTML is a failure mode. The artifact must be interactive.
+- Starting every artifact from a blank HTML file causes repeated layout and
+  interaction regressions. Use the seed scaffold when no project-specific
+  scaffold exists.
 - A tree is insufficient. Component relationships and decision impacts require
   typed `edges[]`.
 - A visually clean timeline can still encode wrong causality. Review stage
@@ -529,6 +576,10 @@ When tool access is limited:
 - Do not import domain terms from adjacent projects or earlier drafts. In the
   AICX cold-start discussion, bringing in unrelated token names created a false
   product primitive. Preserve only the current source vocabulary.
+- Do not collapse source facts, AI inference, and open questions into the same
+  confident node summary. Use `sourceRefs`, `assumption`, and `openQuestions`.
+- Do not let artifact copy sound like a blog post. Remove throat-clearing,
+  generic importance claims, and decorative punchlines.
 - Matching/trading infrastructure should often be isolated as a mature market
   component, not mixed into differentiated product logic.
 - Future settlement cannot be hand-waved. If on-chain migration is plausible,
@@ -570,7 +621,11 @@ When tool access is limited:
 The final response should only claim success after checking:
 
 - the HTML file exists in `outputs/`;
+- `validate_decision_map.mjs` passes when the script is available, or any
+  warnings are reviewed;
 - `model.meta.mapGrammar` exists and the layout matches it;
+- source-backed maps include source references or explicit assumptions/open
+  questions for non-obvious claims;
 - for time-based maps, sequential gates and parallel workstreams are visually
   distinct;
 - for stage-gated maps, the stage order has no unintended backwards edges;
