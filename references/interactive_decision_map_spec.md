@@ -464,6 +464,14 @@ The review should ask:
 - Is the main visual structure showing sequence, dependency, options, or loops
   according to the actual discussion?
 - Are sequential gates visually separated from parallel workstreams?
+- Are the stage and gate orders logically valid, with no unintended backwards
+  dependencies?
+- Does every gate have the cross-workstream inputs it needs before it unlocks
+  the next stage?
+- Are any side-panel gates, estimates, or milestone claims missing from the main
+  timeline or canonical graph?
+- Is any later-stage component incorrectly controlling, auditing, or enabling an
+  earlier-stage decision?
 - What critical relationship is missing?
 - What decision is being treated as reversible but is actually expensive?
 - What mature component should be bought or isolated instead of reinvented?
@@ -501,6 +509,17 @@ When tool access is limited:
 - Static PPT-like HTML is a failure mode. The artifact must be interactive.
 - A tree is insufficient. Component relationships and decision impacts require
   typed `edges[]`.
+- A visually clean timeline can still encode wrong causality. Review stage
+  order, gate inputs, and cross-workstream dependencies as correctness issues,
+  not polish issues.
+- Sidebar text can drift from the canonical graph. If the UI mentions G3,
+  a third gate must exist in the model and timeline.
+- Later-stage controls can accidentally point backward. A risk/governance node
+  placed after a gate should not be modeled as that gate's prerequisite unless
+  it is explicitly a retrospective audit.
+- Gate nodes can be under-specified. If a gate says it checks demand, supply,
+  liquidity, delivery, and risk, each of those inputs should appear as an
+  incoming edge or an explicit open question.
 - Defaulting to a dense component graph is a failure when the source material is
   primarily a staged rollout, cold start path, maturity model, or readiness-gate
   discussion. Use `stage-gated-roadmap` or `swimlane-operating-map` instead.
@@ -554,6 +573,12 @@ The final response should only claim success after checking:
 - `model.meta.mapGrammar` exists and the layout matches it;
 - for time-based maps, sequential gates and parallel workstreams are visually
   distinct;
+- for stage-gated maps, the stage order has no unintended backwards edges;
+- every gate has the required incoming evidence/control inputs represented in
+  the graph, or missing inputs are called out as open questions;
+- sidebar/legend gate labels match first-class stage/gate nodes in the model;
+- later-stage components do not act as prerequisites for earlier-stage gates
+  unless explicitly marked as retrospective review;
 - the page renders nonblank in a browser or equivalent renderer;
 - the UI follows Guizang-derived style rules without horizontal deck pagination;
 - node click, edge click, single-click layer expand/collapse, filters, search,

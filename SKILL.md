@@ -46,6 +46,9 @@ Before drafting the HTML, write a short internal design note with:
   and collapsible panels from the first draft;
 - which edge classes should be visible by default, which should appear only on
   focus/selection, and whether a line-density control is needed;
+- which cross-section dependencies are logically required for each stage or gate
+  to unlock, and which dependencies would be invalid because they point backward
+  in time;
 - how selection state should behave when filters, tabs, or collapsed panels hide
   the currently selected node or edge.
 
@@ -148,6 +151,10 @@ these questions answerable from the UI:
 - Which decisions must happen in sequence, and which workstreams can move in
   parallel?
 - Which milestone gates must be passed before the next stage opens?
+- Which cross-workstream inputs does each gate require, and are those inputs
+  available before or at the gate rather than after it?
+- Which edges imply backwards causality, late governance of an early decision, or
+  a later component unlocking an earlier stage?
 - Which decisions are reversible, expensive, or one-way doors?
 - Which parts can be outsourced or bought as mature infrastructure?
 - Which interfaces must be designed early even if implementation is later?
@@ -219,6 +226,32 @@ For dense or hybrid maps:
   explain the structure; focus mode should explain impact; all-lines mode is for
   debugging or deep inspection.
 
+### Logic And Temporal Consistency
+
+The map must pass a logic review before visual polish is considered complete.
+This is especially important for stage-gated roadmaps and swimlane operating
+maps, where a diagram can look plausible while encoding the wrong order.
+
+For stage-gated or time-based maps:
+
+- Define an explicit order for stages and gates. Every node assigned to a stage
+  should be interpreted relative to that order.
+- Review every edge for temporal direction. A later-stage node must not be the
+  prerequisite, auditor, or controller of an earlier-stage gate unless the edge
+  is explicitly documenting a retrospective review.
+- Each gate should have all required cross-workstream inputs represented as
+  incoming edges. For market maps this often means demand, supply, liquidity,
+  delivery quality, risk/governance, and data/index inputs.
+- Do not let side text mention a gate that is absent from the main timeline.
+  If a sidebar says G3 exists, G3 must be a first-class stage/gate node.
+- Components that are not required to start an earlier stage should stay in a
+  parallel lane, but if they block a later stage, connect them to that later gate
+  explicitly.
+- If a component controls or audits a gate, place it no later than that gate, or
+  explain why it is a retrospective audit rather than an unlock condition.
+- Verify that advancing from one stage to the next is justified by the visible
+  gate inputs, not by prose outside the graph.
+
 ### Source Vocabulary Discipline
 
 Preserve the user's domain vocabulary. Do not import terms, token names,
@@ -265,6 +298,9 @@ Boundaries:
 - Do not render every relationship line and label by default when doing so makes
   the primary structure unreadable. Store all edges in the model, but use visual
   hierarchy and line-density controls in the UI.
+- Do not accept a map that has visually clean stages but incorrect causality.
+  Stage order, gate inputs, and cross-workstream dependencies must be reviewed
+  as first-class correctness criteria.
 
 ## Domain Defaults From The AICX Session
 
@@ -309,25 +345,28 @@ The skill run is complete only when:
 4. Cross-component relationships are visible as typed edges with labels.
 5. If timing, maturity, or rollout is central, sequential gates and parallel
    workstreams are visually separated.
-6. Decision impact is explicit: changing a node or edge shows affected
+6. Stage order and cross-workstream dependency logic are internally consistent:
+   no unintended backwards edges, no missing gate inputs, and no sidebar gate
+   absent from the main timeline.
+7. Decision impact is explicit: changing a node or edge shows affected
    components, blockers, risks, or priority shifts.
-7. Internal agentic loops are represented as internal operating/control loops,
+8. Internal agentic loops are represented as internal operating/control loops,
    including safety review where relevant.
-8. The artifact includes team-priority and decision-capture affordances.
-9. The artifact uses the Guizang-derived visual language without becoming a
+9. The artifact includes team-priority and decision-capture affordances.
+10. The artifact uses the Guizang-derived visual language without becoming a
    horizontal slide deck.
-10. For large maps, side panels are collapsible and fit/zoom controls let the
+11. For large maps, side panels are collapsible and fit/zoom controls let the
     user see the full map overview.
-11. Dense maps use a clear edge visibility strategy: the default view preserves
+12. Dense maps use a clear edge visibility strategy: the default view preserves
     the primary grammar, secondary edges can be revealed through focus/all modes,
     and labels do not clutter the overview.
-12. Filter, search, tab, collapse, and zoom interactions keep selection state
+13. Filter, search, tab, collapse, and zoom interactions keep selection state
     coherent; the detail panel never points at a hidden stale node or edge.
-13. The artifact has been checked in a browser or equivalent rendering path for
+14. The artifact has been checked in a browser or equivalent rendering path for
    nonblank output, layout sanity, clickability, and console errors.
-14. The final vocabulary pass found no imported terms from adjacent projects or
+15. The final vocabulary pass found no imported terms from adjacent projects or
     earlier drafts unless explicitly intended.
-15. Any adversarial review findings are either fixed or called out as remaining
+16. Any adversarial review findings are either fixed or called out as remaining
    risks in the final response.
-16. The final response includes the artifact path and a concise verification
+17. The final response includes the artifact path and a concise verification
    summary.
