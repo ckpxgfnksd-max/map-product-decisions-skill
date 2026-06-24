@@ -26,6 +26,8 @@ about feedback loops, the loop should be visible as the primary structure.
   `reviews[]`.
 - The model declares `meta.mapGrammar` and the UI layout follows it.
 - Every nontrivial component relationship is represented as an edge.
+- Dense maps may hide secondary edges in the default view, but the hidden edges
+  must remain present in `edges[]` and inspectable through focus/all controls.
 - Selection state changes visible details in the UI.
 - Team discussion state can be captured and exported.
 - Review findings change the map or appear as linked risks; they are not buried
@@ -312,6 +314,9 @@ Minimum useful UI:
 - review/risk panel;
 - for large maps, collapsible left/right panels plus fit-to-view, zoom in/out,
   and zoom reset controls;
+- for dense maps, line-density controls or an equivalent edge visibility
+  strategy. The default view should show the primary grammar's essential edges,
+  not every modeled edge;
 - coherent selection behavior after filters, search, tab switches, panel
   collapse, or zoom changes. If the selected node or edge becomes hidden, the UI
   should clear the stale edge selection or move to the first visible node.
@@ -324,6 +329,36 @@ checkboxes/toggles for filters, tabs for graph vs review if the surface is
 crowded. For large maps, include an explicit overview affordance: fit-to-view
 and collapsible side panels are the default. Do not hide relationship meaning
 behind decoration.
+
+### Edge Rendering And Line Clutter
+
+The graph model should be complete; the overview should be readable. These are
+different requirements. Avoid treating "all edges exist" as "all edges and all
+labels must be visible at once."
+
+Recommended edge visibility modes for dense maps:
+
+- `Spine` or Overview: shows only the primary grammar's essential lines. For a
+  stage-gated roadmap, this is usually sequence plus gate/blocking edges on the
+  milestone spine.
+- `Focus`: shows the overview lines plus edges touching the selected node or
+  selected edge.
+- `All`: shows every edge for debugging, review, and deep inspection.
+
+Rendering rules:
+
+- Give edge roles visual hierarchy. Use solid lines for sequence/spine,
+  dashed lines for gates/blocks, lighter dotted lines for feeds, and quieter
+  styles for audit/automation/supporting relationships.
+- Keep edge labels off the default overview unless they are part of the primary
+  grammar. Show labels for selected or related edges.
+- Prefer orthogonal routing for timeline and swimlane maps. Curved cross-lane
+  lines quickly create a tangled mesh and should be used sparingly.
+- Avoid crossing the main stage spine with secondary dependency lines in the
+  default view. If a secondary relation must cross the spine, make it appear
+  only in Focus or All mode.
+- Keep click targets for hidden edges disabled. A hidden or visually suppressed
+  edge should not remain misleadingly clickable.
 
 ### Interaction And Viewport Requirements
 
@@ -345,6 +380,9 @@ uninspectable. Apply these rules before finalizing:
   summaries can create visual overlap and edge-anchor drift.
 - Edge layers must be tested for actual clickability. SVG parent layers with
   disabled pointer events can swallow child path/label interactions.
+- Line-density controls must not create stale state. If an edge becomes hidden
+  after switching modes, the selected edge should clear or remain visible as an
+  intentional exception.
 
 ## Visual Style
 
@@ -432,6 +470,10 @@ The review should ask:
 - What future constraint must be represented now?
 - What safety/security/privacy loop is implied but absent?
 - Does the UI make impact chains visible without reading prose?
+- Does the default line mode preserve the primary grammar, or does an edge mesh
+  obscure the map's main point?
+- Are secondary edges discoverable through focus/all controls without cluttering
+  the first view?
 - Can a team use the artifact to decide priority this week?
 
 For web3 or settlement-aware architectures, also ask:
@@ -478,6 +520,9 @@ When tool access is limited:
   this workflow, not end-user UI automation.
 - `localStorage.setItem` can fail; catch persistence errors.
 - Filtered or dimmed edges should not remain misleadingly clickable.
+- Rendering every edge and every edge label by default can turn a correct graph
+  into an unusable tangle. Default to the primary grammar's essential lines and
+  expose secondary edges through focus/all modes.
 - SVG edge layers with `pointer-events: none` can make edges and edge labels
   unclickable even when child elements set pointer events. Verify edge clicks.
 - Reused heading or lane coordinates can stack controls on top of each other.
@@ -491,6 +536,10 @@ When tool access is limited:
   every filter/search/tab/collapse action.
 - Top toolbars can overlap map content on narrow desktop widths. Let controls
   wrap and keep the graph shell below the toolbar's actual height.
+- Curved lines across swimlanes can create visual knots. Prefer straight or
+  orthogonal routing for time/spine/lane maps.
+- Edge labels are information, not decoration. Showing every label in overview
+  mode usually creates text clutter; reveal labels on selection or focus.
 - Heavy CSS transitions on large transformed graph containers can make panning
   and zoom sluggish.
 - External links opened in a new tab need `rel="noopener noreferrer"`.
@@ -513,6 +562,10 @@ The final response should only claim success after checking:
   reset work;
 - filter/search/tab/collapse actions do not leave detail panels pointing at
   hidden stale nodes or edges;
+- dense maps have a default line mode that preserves the primary grammar, plus
+  a way to reveal secondary edges intentionally;
+- edge labels do not clutter the overview; selected/focused edges expose labels
+  and impact details;
 - SVG edges and edge labels are actually clickable;
 - repeated stage/lane/heading controls do not overlap at duplicate coordinates;
 - no visible text overlap at common desktop and mobile widths;

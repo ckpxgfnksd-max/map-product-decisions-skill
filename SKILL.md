@@ -44,6 +44,8 @@ Before drafting the HTML, write a short internal design note with:
 - what vocabulary must be preserved or explicitly excluded from the source;
 - whether the map is likely to exceed one viewport and therefore needs fit/zoom
   and collapsible panels from the first draft;
+- which edge classes should be visible by default, which should appear only on
+  focus/selection, and whether a line-density control is needed;
 - how selection state should behave when filters, tabs, or collapsed panels hide
   the currently selected node or edge.
 
@@ -128,6 +130,10 @@ The artifact must include:
   and right panels, fit-to-view, zoom in/out, and reset zoom. These controls are
   required when the graph cannot fit alongside both sidebars at common desktop
   widths.
+- For dense maps, a line-visibility strategy. The default view should show the
+  primary grammar's essential edges, not every relationship. Provide controls
+  such as Spine / Focus / All, or equivalent, when all edges would visually
+  overwhelm the map.
 - Interaction-state consistency: filters, search, tab switches, collapsed
   panels, and hidden nodes must not leave the UI focused on an invisible or
   stale node/edge.
@@ -190,6 +196,29 @@ stage or swimlane maps, reserve screen real estate for the primary grammar:
 sidebars should be collapsible and a fit-to-view control should expose the full
 spine without requiring manual horizontal scrolling first.
 
+### Edge Visibility Discipline
+
+Represent every important relationship in `edges[]`, but do not necessarily
+render every edge at once. A map can be structurally complete and visually
+unusable if every dependency line and label is visible by default.
+
+For dense or hybrid maps:
+
+- Default to the primary grammar's essential edges. In a stage-gated roadmap,
+  this usually means the sequential spine and gate/blocking edges.
+- Show secondary dependency edges through an explicit mode such as Focus or All,
+  or when the user selects a related node or edge.
+- Edge labels should be sparse by default. Show labels for selected or related
+  edges; avoid labeling every edge in the overview.
+- Use different visual treatments for different edge roles: solid for sequence,
+  dashed for gates/blocks, dotted or lighter lines for feeds, audits, or
+  secondary dependencies.
+- Prefer predictable orthogonal routing for swimlanes and timelines. Avoid a
+  dense mesh of curved lines crossing the main spine.
+- The visible-line count should serve the current task. Overview mode should
+  explain the structure; focus mode should explain impact; all-lines mode is for
+  debugging or deep inspection.
+
 ### Source Vocabulary Discipline
 
 Preserve the user's domain vocabulary. Do not import terms, token names,
@@ -233,6 +262,9 @@ Boundaries:
 - Do not ship a map where the first useful view is trapped between permanent
   sidebars. If the graph is wider than the available viewport, include overview
   controls and collapsible panels so the team can see the whole structure.
+- Do not render every relationship line and label by default when doing so makes
+  the primary structure unreadable. Store all edges in the model, but use visual
+  hierarchy and line-density controls in the UI.
 
 ## Domain Defaults From The AICX Session
 
@@ -286,13 +318,16 @@ The skill run is complete only when:
    horizontal slide deck.
 10. For large maps, side panels are collapsible and fit/zoom controls let the
     user see the full map overview.
-11. Filter, search, tab, collapse, and zoom interactions keep selection state
+11. Dense maps use a clear edge visibility strategy: the default view preserves
+    the primary grammar, secondary edges can be revealed through focus/all modes,
+    and labels do not clutter the overview.
+12. Filter, search, tab, collapse, and zoom interactions keep selection state
     coherent; the detail panel never points at a hidden stale node or edge.
-12. The artifact has been checked in a browser or equivalent rendering path for
+13. The artifact has been checked in a browser or equivalent rendering path for
    nonblank output, layout sanity, clickability, and console errors.
-13. The final vocabulary pass found no imported terms from adjacent projects or
+14. The final vocabulary pass found no imported terms from adjacent projects or
     earlier drafts unless explicitly intended.
-14. Any adversarial review findings are either fixed or called out as remaining
+15. Any adversarial review findings are either fixed or called out as remaining
    risks in the final response.
-15. The final response includes the artifact path and a concise verification
+16. The final response includes the artifact path and a concise verification
    summary.
