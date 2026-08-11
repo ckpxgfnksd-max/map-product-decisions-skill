@@ -1,3 +1,4 @@
 interface:
   display_name: "Map Product Decisions"
-  short_description: "Create clear interactive HTML decision maps for product and architecture tradeoffs"
+  short_description: "Build interactive maps for complex product decisions"
+  default_prompt: "Use $map-product-decisions to turn this product discussion into a validated interactive decision map."

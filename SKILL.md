@@ -1,48 +1,203 @@
 ---
 name: map-product-decisions
 description: |
-  Turn complex product design, architecture, market-structure, workflow,
-  protocol, operating-model, or "copy this structure" discussions into a clear
-  single-file interactive HTML decision map. Use when the user needs a
-  team-discussion artifact that makes components, priorities, dependencies,
-  stage gates, tradeoffs, risks, and decision impact inspectable through nodes,
-  typed edges, focused details, and editable decision state rather than prose,
-  slides, or a static diagram.
+  Turn a complex product, architecture, workflow, protocol, operating-model,
+  rollout, or option discussion into a browser-openable interactive HTML
+  decision map. Use when a team needs to inspect typed dependencies, impact
+  chains, stage gates, parallel workstreams, feedback loops, tradeoffs, risks,
+  evidence, or editable decision state in one shared artifact. Do not use for a
+  simple memo, an ADR about one isolated choice, a static Mermaid diagram, a
+  sitemap, slides, or an engineering review whose architecture is already fixed.
 ---
 
 # Map Product Decisions
 
-## Target Outcome
+## Outcome
 
-Produce one browser-openable HTML file that lets a team inspect a product or
-architecture decision system, debate priorities, and export the current
-decision state.
+Produce one interactive HTML file that helps a team make or revisit a concrete
+decision. The first viewport must show the dominant decision question and the
+structure that changes its answer.
 
-The artifact is a decision map, not a sitemap, slide deck, blog post, or pretty
-static diagram. It must include a graph model with explicit `nodes[]`, `edges[]`,
-`decisions[]`, and `reviews[]`. The UI should make the dominant decision
-question obvious in the first viewport.
+The artifact is a decision interface, not a decorative graph. If a table, one
+ADR, or a short sequence would answer the question more clearly, use that
+simpler format and explain why a map would add noise.
 
 ## Required Resources
 
-Before drafting or editing the HTML, load:
+Before building or editing HTML, load:
 
-- `references/interactive_decision_map_spec.md` for schema, interaction,
-  validation, edge taxonomy, and known traps.
-- `references/ui_ux_simplicity.md` for the UI simplicity contract and research
-  patterns from popular design libraries.
+- `references/interactive_decision_map_spec.md` for the canonical schema,
+  grammar rules, edge semantics, interaction contract, and known traps.
+- `references/ui_ux_simplicity.md` for first-viewport, progressive-disclosure,
+  accessibility, and layout rules.
+- `references/source_quality_pipeline.md` when claims are research-heavy,
+  time-sensitive, disputed, or expected to evolve.
 
-Also load `references/source_quality_pipeline.md` when the source material is
-research-heavy, time-sensitive, evidence-backed, or likely to evolve across
-multiple revisions.
-
-Prefer `assets/decision-map-seed.html` when the current project has no stronger
-local scaffold. Replace its model and task-specific behavior; keep its stable
-tokens, graph slots, zoom/fit/export controls, edge-density modes, and
-responsive shell unless the source material requires a better grammar-specific
+Use `assets/decision-map-seed.html` when no stronger local scaffold exists. It
+contains a working renderer, filters, node and relation focus, safe personal
+draft persistence, versioned import/export, fit/zoom, panel collapse, and
+responsive behavior. Replace the example model and storage identity; preserve
+the tested interaction shell unless the chosen grammar needs a different
 layout.
 
-## Output Contract
+## Decision Brief
+
+Resolve these before modeling. Record them in `model.meta` or the internal
+design note:
+
+- `decisionQuestion`: the one question the meeting must answer;
+- audience and accountable decision owner;
+- `decisionHorizon`: when the choice must be made or revisited;
+- what is in scope, explicitly out of scope, and still unknown;
+- which choices are two-way, costly, or one-way doors;
+- what evidence or gate would change the current recommendation;
+- chosen map grammar and why a simpler artifact is insufficient.
+
+If the question is really “what does the system contain?”, sharpen it. A useful
+map asks what blocks, enables, constrains, branches, unlocks, or changes future
+behavior.
+
+## Grammar Selection
+
+Choose one dominant grammar and make the layout visibly match it:
+
+- `dependency-graph`: what blocks, enables, or constrains what;
+- `stage-gated-roadmap`: what sequence and evidence unlock the next stage;
+- `swimlane-operating-map`: what moves in parallel and where handoffs occur;
+- `decision-tree`: which condition changes the path; include an explicit
+  `decision` node with labeled branches to `option`, `outcome`, or `branch`
+  nodes;
+- `option-tradeoff-map`: which option wins or fails against which criterion;
+- `system-loop-map`: which feedback loop changes future behavior.
+
+Hybrid maps are allowed only when the primary grammar remains obvious in five
+seconds. Put time and gates on a spine, parallel work in lanes, and secondary
+relationships behind Focus or All.
+
+## Canonical Model Contract
+
+Embed the canonical model as parseable JSON:
+
+```html
+<script type="application/json" id="decision-map-model">
+{
+  "meta": {
+    "title": "Example",
+    "decisionQuestion": "What must be true before release?",
+    "schemaVersion": 2,
+    "modelVersion": "1.0.0",
+    "baseRevision": "brief-2026-08-11",
+    "mapGrammar": "dependency-graph"
+  },
+  "sources": [],
+  "nodes": [],
+  "edges": [],
+  "decisions": [],
+  "reviews": []
+}
+</script>
+```
+
+The delivered map must contain non-empty `nodes[]` and `edges[]`. Use stable,
+lowercase-hyphenated IDs and keep references machine-valid.
+
+Each node exposes purpose, owner/actor, priority, maturity, decisions, risks,
+open questions, interfaces, provenance, and downstream impact. Each edge is
+directed and typed; it explains its impact and what changes if removed. A
+parent/child hierarchy is not enough.
+
+Treat edge types as semantics, not line decoration. Preserve direction in
+incoming/outgoing views. Do not propagate downstream impact through ownership,
+grouping, or other non-causal relations unless the type explicitly allows it.
+
+## Decisions, Evidence, and Reviews
+
+Model important choices as compact ADRs rather than editable labels. A decision
+should include context, options, rationale, tradeoffs, consequences, confidence,
+reversibility, owner/driver, reviewers/approvers, acceptance criteria, rollback
+plan, status, and affected nodes where relevant.
+
+Accepted decisions are historical records. Do not silently rewrite them. Create
+a new proposal with `supersedes` / `supersededBy` links when the team changes
+course. Keep blocking concerns or dissent visible; silence is not acceptance.
+
+For source-backed maps:
+
+- include `sources[]` and attach `sourceRefs` to non-obvious nodes, edges,
+  decisions, and reviews;
+- mark inference with `assumption` and uncertainty with `openQuestions`;
+- separate facts, inferred patterns, time-bounded snapshots, and open questions;
+- preserve source vocabulary and reject nouns imported from adjacent projects.
+
+Reviews must link back to graph elements. Cover product, engineering,
+security/privacy, and internal agentic-loop concerns when those surfaces exist.
+Turn review findings into nodes, edges, decisions, or visible risks rather than
+appending an unstructured essay.
+
+## Interaction Contract
+
+Use progressive disclosure:
+
+1. **Overview**: dominant grammar, essential nodes, essential edges.
+2. **Focus**: selection, direct neighbors, blockers, downstream effects.
+3. **Detail**: metadata, evidence, decision records, reviews, and full relation
+   explanations.
+
+Provide grammar-appropriate filters and search. Hidden nodes and edges must not
+remain selected or clickable. Node and relation selection must work by keyboard;
+if SVG edges are hidden from the accessibility tree, generate an equivalent
+text relation list from the same model.
+
+`localStorage` is only a best-effort personal draft cache. It can fail and is
+not team collaboration. Cross-person exchange uses versioned Import/Export JSON
+with at least `schemaVersion`, `modelVersion`, `baseRevision`, timestamps, and
+append-only event IDs. Reject or surface stale-base conflicts instead of
+silently overwriting state.
+
+For dense maps, default to Overview and add Focus/All, grouping, fit-to-view,
+zoom, and collapsible panels. Prioritize fewer edge crossings and text overlaps
+over visual symmetry. All-lines mode is for audit, never the opening view.
+
+## Design Note Before Build
+
+Write a short internal note covering:
+
+- decision question, owner, horizon, grammar, and first-viewport answer;
+- sequential gates versus parallel workstreams;
+- source nouns to preserve and forbidden imported terms;
+- facts, patterns, snapshots, assumptions, and open questions;
+- essential versus focus-only edges;
+- reversibility, interfaces that must be decided early, and rollback points;
+- viewport pressure, crossing/overlap risks, and stale-selection behavior.
+
+## Visual Discipline
+
+Use Guizang Swiss International by default: strict grid, paper/ink contrast,
+one restrained accent, hairline dividers, rectangular information surfaces,
+strong type hierarchy, and compact mono metadata. Borrow visual discipline from
+`ckpxgfnksd-max/guizang-ppt-skill`, not its slide mechanics.
+
+Do not add a hero, decorative blobs, cards inside cards, deck pagination,
+rainbow layer colors, or onboarding prose inside the map. Node cards carry a
+title and compact metadata; explanations belong in Detail.
+
+## Conditional Domain Review
+
+Do not inject exchange, settlement, EVM, proof, privacy-tech, or agentic-loop
+objects unless the source supports them. When the product actually resembles an
+exchange, marketplace, protocol, or AI-output market, raise the relevant items
+as review questions first:
+
+- which mature infrastructure should be isolated or bought;
+- which state, settlement, proof, privacy, audit, or governance boundaries must
+  remain stable if implementations change;
+- what can be automated, what should be automated, and where escalation,
+  human sign-off, rollback, audit logs, or kill switches belong.
+
+Promote an answer into the model only when it is sourced, explicitly assumed,
+or left as an open question.
+
+## Validation
 
 Create:
 
@@ -50,203 +205,41 @@ Create:
 outputs/<topic>_decision_map.html
 ```
 
-The file must open directly in a browser unless the current project already
-requires a dev server. Avoid external runtime dependencies. If a library is
-used, explain why and preserve a local or graceful fallback.
-
-The artifact must include:
-
-- `model.meta.mapGrammar`, matching the visual layout.
-- `nodes[]`, `edges[]`, `decisions[]`, and `reviews[]`.
-- `sources[]` plus `sourceRefs`, `assumption`, or `openQuestions` for
-  source-backed or uncertain claims.
-- Typed, inspectable edges. A parent/child hierarchy is not enough.
-- Clickable node details: purpose, owner/actor, priority, maturity, decisions,
-  risks, open questions, interfaces, and downstream impact.
-- Clickable edge details: relationship type, label, impact, and what changes if
-  removed.
-- Filters matched to the map grammar.
-- Team decision capture with safe `localStorage` handling.
-- JSON export of the current model plus persisted decision state.
-- A visible review/risk surface covering product, engineering,
-  security/privacy, and internal agentic-loop concerns where relevant.
-- Responsive desktop and mobile layout with no overlapping text or controls.
-
-## UI Simplicity Contract
-
-The first view should answer one question:
-
-- For `stage-gated-roadmap`: What sequence unlocks progress?
-- For `swimlane-operating-map`: Which lanes move in parallel, and where do they
-  hand off?
-- For `dependency-graph`: What blocks, constrains, or enables what?
-- For `decision-tree`: Which condition changes the path?
-- For `option-tradeoff-map`: Which option wins or fails against which
-  criterion?
-- For `system-loop-map`: What feedback loop changes future behavior?
-
-Use progressive disclosure:
-
-1. Overview: show the primary grammar and only essential edges.
-2. Focus: show selected node or edge, direct neighbors, blockers, and impacts.
-3. Detail: show full metadata, source notes, decisions, reviews, and all edge
-   explanations.
-
-Keep the chrome simple:
-
-- One center map.
-- At most one left navigation/filter panel and one right detail/review panel.
-- Side panels collapse when they reduce the map's readability.
-- Top controls are compact and wrap safely.
-- Use familiar controls: tabs for major modes, checkboxes/toggles for filters,
-  icon buttons for zoom/export/reset when available, and direct command labels
-  for destructive or persisted actions.
-- Do not place cards inside cards. Do not add hero sections, decorative blobs,
-  deck pagination, or explanatory onboarding text.
-
-Default to the simplest readable representation. If the map needs more than
-about 24 visible nodes, 35 visible edges, or two persistent side panels, add
-grouping, collapse, search, fit-to-view, and line-density controls before adding
-more visible detail.
-
-## Map Grammar Selection
-
-Pick the grammar that encodes the dominant structure:
-
-- `stage-gated-roadmap`: rollout, cold start, maturity, launch order, readiness
-  thresholds, milestones, or "only after X can Y happen."
-- `swimlane-operating-map`: multiple teams, loops, workstreams, or functions
-  moving in parallel across time.
-- `dependency-graph`: components, ownership, interfaces, coupling, blockers,
-  and constraints.
-- `decision-tree`: conditional branching, go/no-go paths, or yes/no evidence
-  gates.
-- `option-tradeoff-map`: alternatives, criteria, constraints, consequences, and
-  decision status.
-- `system-loop-map`: feedback loops, flywheels, monitoring, control systems, or
-  agentic iteration.
-
-Hybrid maps are allowed, but the primary grammar must remain visually dominant.
-If the source changes or the artifact feels chaotic, reassess the grammar before
-adding nodes.
-
-## Design Note Before Building
-
-Write a short internal design note before drafting the HTML:
-
-- chosen grammar and why it fits;
-- first-viewport decision question;
-- sequential gates vs parallel workstreams;
-- source vocabulary to preserve and terms to exclude;
-- facts, inferred patterns, snapshots, assumptions, and open questions;
-- default visible edges, focus-only edges, and all-lines/debug edges;
-- expected viewport pressure and required collapse/zoom/fit controls;
-- temporal logic risks, including backwards dependencies;
-- selection behavior when filters, tabs, search, or collapsed panels hide the
-  current selection.
-
-## Reasoning Quality Bar
-
-The UI must let a team answer:
-
-- Which components depend on this decision?
-- Which components block or constrain it?
-- Which decisions must happen in sequence?
-- Which workstreams can move in parallel?
-- Which gates must pass before the next stage opens?
-- Which cross-workstream inputs does each gate require?
-- Which edges imply backwards causality or late governance?
-- Which decisions are reversible, expensive, or one-way doors?
-- Which interfaces must be designed early even if implementation comes later?
-- Which privacy, security, settlement, data, governance, or agentic-loop
-  assumptions create long-term constraints?
-- What should be prioritized now, next, later, monitored, or rejected?
-
-For complex tasks, use independent passes or subagents when available. Split by
-concern: product/market, architecture/data/interfaces, security/privacy,
-UI/interaction, and internal agentic loops. Merge disagreements into graph
-nodes, edges, decisions, or review findings rather than appending loose prose.
-
-## Visual Style
-
-Borrow visual discipline from `ckpxgfnksd-max/guizang-ppt-skill`
-(https://github.com/ckpxgfnksd-max/guizang-ppt-skill), not its horizontal deck
-interaction.
-
-Default for product, architecture, engineering, data, and protocol maps:
-Guizang Swiss International style: strict grid, high contrast, restrained
-accent color, hairline dividers, strong type hierarchy, compact metadata, and
-information-dense panels.
-
-Use the Guizang electronic magazine direction only when the map is primarily
-strategy, narrative, or culture. Even then, keep controls and graph labels
-plain, readable, and task-focused.
-
-## Source Vocabulary Discipline
-
-Preserve the user's domain vocabulary. Do not import token names, product
-objects, regulatory assumptions, or architecture primitives from earlier
-sessions unless the current source explicitly includes them.
-
-Before finalizing:
-
-- list nouns that must appear because they came from the source;
-- list forbidden terms that came from adjacent projects or model inference;
-- search the HTML for forbidden terms;
-- shorten card copy and move long explanations into detail panels.
-
-## Domain Defaults
-
-When the product resembles an exchange, marketplace, protocol, or AI-output
-market, carry these defaults unless the user overrides them:
-
-- Treat trading/matching as its own component.
-- Separate mature exchange, matching, order-management, custody, and inventory
-  infrastructure from differentiated product logic.
-- If future on-chain settlement is plausible, define settlement events, state
-  transition boundaries, and EVM-compatible interfaces early.
-- Model privacy as an interface: proof packets, data boundaries, verification
-  consumers, audit logs, and selective disclosure points.
-- Treat agentic loops as internal product, safety, review, and iteration loops
-  unless the user asks for end-user automation.
-- Separate "can be automated" from "should be automated"; escalation, kill
-  switches, auditability, and human sign-off are first-class map elements.
-
-## Validation
-
-If available, run the validator from the skill folder:
+Run delivery validation:
 
 ```bash
 node scripts/validate_decision_map.mjs outputs/<topic>_decision_map.html
 ```
 
-Treat failures as blockers. Treat warnings as review prompts.
+Use `--scaffold` only while intentionally validating an incomplete template.
+Use `--legacy` only to inspect a pre-v2 artifact that has not migrated to the
+canonical JSON block; a legacy pass does not prove model integrity.
 
-Also check the HTML in a browser or equivalent rendering path for nonblank
-output, layout sanity, clickability, console errors, zoom/fit/panel collapse,
-filters/search, JSON export, localStorage failure handling, and stale selection
-behavior after filtering or tab changes.
+Also run browser QA at a normal desktop width and a narrow mobile width. Verify
+nonblank render, console errors, node and relation clicks, keyboard focus,
+filters/search, stale-selection cleanup, Overview/Focus/All, fit/zoom/panel
+collapse where present, personal-draft failure handling, versioned export,
+import conflict behavior, and text/control overlap.
 
 ## Acceptance Criteria
 
-The run is complete only when:
+Complete the run only when:
 
-1. A browser-openable HTML artifact exists in `outputs/`.
-2. `model.meta.mapGrammar` exists and matches the layout.
-3. Major components are nodes with inspectable metadata.
-4. Major relationships are typed edges with impact details.
-5. The first view exposes the primary decision structure without edge clutter.
-6. Dense maps use Overview/Focus/All or an equivalent line-density strategy.
-7. Large maps include collapsible panels plus fit/zoom/reset controls.
-8. Time-based maps separate sequential gates from parallel workstreams.
-9. Gate order, required inputs, and cross-workstream dependencies are logically
-   consistent.
-10. Team priority, notes, or decisions can be captured and exported.
-11. Review findings are linked to graph elements or visible risks.
-12. Source-backed maps preserve provenance and uncertainty.
-13. Filters, search, tabs, collapse, and zoom do not leave stale hidden
-    selections in the detail panel.
-14. The UI follows Guizang-derived visual discipline without becoming a deck.
-15. The vocabulary pass finds no unintended imported terms.
-16. Static validation and browser checks have been run when available, and
-    remaining limitations are stated in the final response.
+1. The HTML opens in a browser and the first viewport answers the declared
+   `decisionQuestion` through the selected grammar.
+2. Canonical JSON passes schema and referential-integrity validation.
+3. Nodes, typed edges, decisions, reviews, sources, uncertainty, and vocabulary
+   follow the contracts above.
+4. Impact chains, gates, parallel lanes, conditions, criteria, or feedback loops
+   are inspectable without reading every detail panel.
+5. Accepted decisions remain traceable; reversibility, concerns, rollback, and
+   revisit conditions are visible where material.
+6. Filters, search, density modes, tabs, collapse, and zoom never leave stale or
+   misleading selection state.
+7. Personal draft persistence fails safely and team exchange is versioned and
+   conflict-aware.
+8. Keyboard users can reach the same relationship meaning as pointer users;
+   color is not the only state signal.
+9. Source-backed claims preserve provenance and unsupported claims are labeled.
+10. Static validation, browser checks, vocabulary search, and an adversarial
+    review have run; remaining limitations are stated.

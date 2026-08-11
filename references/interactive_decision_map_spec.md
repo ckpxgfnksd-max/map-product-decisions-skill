@@ -31,7 +31,8 @@ about feedback loops, the loop should be visible as the primary structure.
 - Dense maps may hide secondary edges in the default view, but the hidden edges
   must remain present in `edges[]` and inspectable through focus/all controls.
 - Selection state changes visible details in the UI.
-- Team discussion state can be captured and exported.
+- Personal draft state fails safely; team exchange uses versioned Import/Export
+  JSON rather than pretending `localStorage` is shared collaboration.
 - Review findings change the map or appear as linked risks; they are not buried
   as unstructured prose.
 
@@ -44,8 +45,11 @@ an existing data-loading pattern.
 const model = {
   meta: {
     title: "AICX Architecture Decision Map",
+    decisionQuestion: "Which boundary must be fixed before implementation?",
+    schemaVersion: 2,
+    modelVersion: "1.0.0",
+    baseRevision: "founder-notes-2026-06-22",
     generatedAt: "2026-06-22",
-    version: 1,
     mapGrammar: "dependency-graph",
     sourceNotes: []
   },
@@ -94,6 +98,18 @@ const model = {
       title: "Separate matching engine from differentiated product logic",
       status: "proposed",
       priority: "now",
+      reversibility: "costly",
+      context: "The differentiated product should not inherit matching-engine coupling.",
+      options: ["Build together", "Separate boundary", "Use a mature provider"],
+      rationale: "Keep replaceable infrastructure behind a stable interface.",
+      tradeoffs: ["More interface work now; lower replacement cost later"],
+      consequences: ["Matching events need versioned contracts"],
+      confidence: "medium",
+      driver: "product lead",
+      reviewers: ["engineering", "security"],
+      approvers: ["product lead"],
+      acceptanceCriteria: ["Interface contract reviewed"],
+      rollbackPlan: "Keep the existing adapter until the new boundary is proven.",
       affects: ["matching-engine", "market-integrations", "risk-engine"]
     }
   ],
@@ -118,8 +134,11 @@ For stage-gated or swimlane maps, add explicit stage/lane arrays while keeping
 const model = {
   meta: {
     title: "AICX Market Launch Stage Map",
+    decisionQuestion: "What evidence unlocks open market access?",
+    schemaVersion: 2,
+    modelVersion: "1.0.0",
+    baseRevision: "launch-brief-2026-06-24",
     generatedAt: "2026-06-24",
-    version: 1,
     mapGrammar: "stage-gated-roadmap",
     sourceNotes: []
   },
@@ -187,9 +206,16 @@ Edge fields:
 
 Decision fields:
 
-- `id`, `title`, `status`, `priority`, and `affects`.
+- `id`, `title`, `status`, `priority`, `reversibility`, and `affects`.
+- For material choices, also use `context`, `options`, `rationale`,
+  `tradeoffs`, `consequences`, `confidence`, `driver`, `reviewers`,
+  `approvers`, `acceptanceCriteria`, and `rollbackPlan`.
 - `status` should distinguish proposed, accepted, rejected, blocked, and needs
   review.
+- Accepted decisions are append-only records. Use `supersedes` and
+  `supersededBy` when a later decision changes course.
+- Store blocking concerns or dissent separately from general notes. Silence is
+  not approval.
 
 Review fields:
 
@@ -207,6 +233,14 @@ Decision ledger fields, when used:
 
 - `id`, `date`, `status`, `decision`, `evidence`, `affects`, and `revisitWhen`.
 - Use it when the map should continue across multiple team discussions.
+
+Exchange envelope fields, when importing or exporting discussion state:
+
+- `schemaVersion`, `modelVersion`, `baseRevision`, and `exportedAt`.
+- append-only events with `eventId`, `actor`, `timestamp`, `kind`, `targetId`,
+  and `value`.
+- Reject or surface stale-base conflicts. Never silently overwrite a newer
+  decision history with an older browser export.
 
 ## Node Taxonomy
 
@@ -273,7 +307,10 @@ parallelism obvious. Cross-lane edges should show handoffs and constraints.
 
 Use when the main structure is conditional branching or go/no-go logic. Nodes
 should include decision conditions, required evidence, and consequences. Edges
-should be labeled by conditions, not generic dependency labels.
+should be labeled by conditions, not generic dependency labels. Mark the branch
+point with `node.kind: "decision"` (or layer `decision`) and its direct targets as
+`option`, `outcome`, or `branch`; otherwise an ordinary dependency graph can be
+mis-labeled as a tree without changing its decision semantics.
 
 ### `option-tradeoff-map`
 
@@ -297,6 +334,13 @@ decision structure.
 Every important relationship should be an edge. Avoid treating a parent/child
 tree as enough.
 
+For maps with custom relationship types, declare `meta.edgeTypes[]`. Each entry
+should state `type`, `sourceMeaning`, `targetMeaning`, `inverseLabel`,
+`propagatesImpact`, and `cyclePolicy`; optionally constrain source and target
+node kinds. This keeps incoming/outgoing labels, impact traversal, and cycle
+checks from guessing at semantics. Ownership and grouping edges should not
+propagate causal impact by default.
+
 Recommended edge types:
 
 - `depends_on`: source needs target to work.
@@ -316,6 +360,9 @@ Recommended edge types:
 - `gates`: source is a milestone or threshold target must pass.
 
 Give each edge a short label plus a longer `impact` or `ifRemoved` explanation.
+Direction is part of the meaning. Do not create a reverse edge merely to make a
+line visible from both nodes; use the registered inverse label in the incoming
+view.
 
 ## UI Requirements
 
@@ -334,10 +381,13 @@ Minimum useful UI:
 - search;
 - selected node panel with incoming/outgoing/blocking relationships;
 - selected edge panel with impact and "if removed" explanation;
-- priority editor or decision notes saved to `localStorage`;
+- priority editor or decision notes saved to guarded `localStorage` as a
+  personal draft cache only;
 - optional decision ledger when the map is expected to evolve across sessions;
 - source notes or source filters when provenance changes confidence;
 - export JSON button;
+- import JSON with schema/base-revision conflict checks when the map is used
+  across people or revisions;
 - reset/clear saved decisions button;
 - review/risk panel;
 - for large maps, collapsible left/right panels plus fit-to-view, zoom in/out,
@@ -402,6 +452,10 @@ uninspectable. Apply these rules before finalizing:
 - Filter/search actions must keep selection state coherent. A detail panel must
   not keep describing a node or edge that has become hidden by the current
   filters.
+
+If the SVG graph is `aria-hidden`, generate an equivalent keyboard-accessible
+relation list from the same `edges[]`. A pointer-only edge path is not an
+accessible representation of relationship meaning.
 - Repeated controls created from stages, lanes, layers, or headings must have
   unique coordinates or layout slots. Duplicate positions are a visible bug.
 - Node cards should have stable dimensions or measured anchors. Variable-height
