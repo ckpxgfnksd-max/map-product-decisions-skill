@@ -2,6 +2,17 @@
 
 Turn a complex product discussion into a single-file interactive HTML decision map.
 
+## Choose a version
+
+Both maintained UI directions live in this repository:
+
+| Version | Best for | Download |
+|---|---|---|
+| **Classic** (`main`) | Light, document-like maps and the latest hardened runtime | [Download ZIP](https://github.com/ckpxgfnksd-max/map-product-decisions-skill/archive/refs/heads/main.zip) |
+| **Night Signal** (`night-signal`) | Dense system maps, live workshops, and low-light operational review | [Download ZIP](https://github.com/ckpxgfnksd-max/map-product-decisions-skill/archive/refs/heads/night-signal.zip) |
+
+The branches share the same decision-mapping purpose but are intentionally versioned separately, so users can choose a visual system without one variant overwriting the other.
+
 This skill is for teams that need to see dependencies, feedback loops, stage gates, parallel work, trade-offs, risks, evidence, and decision history in one inspectable artifact. It is not a general diagram generator: the map begins with a decision question and preserves why a choice was made, what it affects, and how it can be reversed.
 
 ## Public and private boundary
