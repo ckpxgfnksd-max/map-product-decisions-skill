@@ -414,67 +414,64 @@ uninspectable. Apply these rules before finalizing:
 
 ## Visual Style
 
-Use `ckpxgfnksd-max/guizang-ppt-skill`
-(https://github.com/ckpxgfnksd-max/guizang-ppt-skill) as the visual style
-source. Borrow its single-file HTML discipline, editorial polish, typography,
-grid logic, curated themes, and high-contrast presentation quality.
+Use Impeccable (https://github.com/pbakaus/impeccable) as the product-UI quality
+floor: semantic tokens, complete states, earned familiarity, restrained motion,
+structural responsiveness, and explicit anti-slop checks. Retain Guizang's
+single-file discipline, alignment, information hierarchy, and editorial
+precision without borrowing slide/deck interaction.
 
-Do not borrow its horizontal slide/deck interaction. This artifact is a
-continuous interactive decision map with graph navigation, layer expansion,
-filters, detail panels, and editable decision state.
+### Night Signal Adapter
 
-### Guizang Style Adapter
+Default product and architecture maps to Night Signal.
 
-Default for product/architecture maps: Guizang Swiss International style.
-
-- Use a strict modular grid, ideally 12 or 16 columns.
-- Use Inter / Helvetica Neue / Noto Sans SC for the main UI and JetBrains Mono
-  or an equivalent mono face for IDs, metadata, node counts, and edge labels.
-- Use a light paper background, near-black ink, calibrated greys, and a single
-  high-saturation accent. Default accent: IKB blue `#002FA7`.
-- Use the accent sparingly for selected nodes, active filters, key counts,
-  active edge paths, and high-priority decisions.
-- Use hairline dividers, rectangular panels, minimal shadows, and tight
-  alignment. Cards and panels should feel like information surfaces, not
-  marketing cards.
-- Favor large, thin strategic labels for map headings and compact semibold
-  metadata labels for controls.
-- Use dot-matrix, fine-grid, rule-line, or mono-index details as subtle texture
-  only when they do not compete with graph readability.
-
-Optional for strategy/narrative maps: Guizang electronic magazine style.
-
-- Use warm paper/ink palettes and a stronger editorial title treatment.
-- Serif headings are acceptable for narrative sections, but controls and graph
-  labels should stay readable and mostly sans-serif.
-- Fluid or contour backgrounds may appear only as passive atmosphere outside the
-  graph interaction area; they must not reduce performance or readability.
+- Use tinted dark neutrals, not pure black or category-default grey.
+- Give the canvas the largest area and strongest contrast. Use a second neutral
+  for side panels and toolbars.
+- Use cyan only for selection, focus, active edge paths, and primary actions.
+  Use amber for review risk and reserve red for destructive/blocking states.
+- Use a compact sans-serif UI family. Reserve mono for IDs, counts, edge types,
+  coordinates, and data.
+- Use 12–14px node/panel radii, 8–10px control radii, and pills only for compact
+  statuses. Let borders or soft offset shadows carry elevation; avoid ghost
+  cards that use both everywhere.
+- Keep transitions between 150–220ms and tied to state. Do not use page-load
+  choreography, elastic easing, decorative glow, or glass.
+- A faint grid is allowed only inside the actual map canvas. Other surfaces stay
+  plain and structural.
+- On mobile, convert panels to overlay drawers. Do not shrink the graph and type
+  until they become unreadable.
 
 Theme defaults:
 
 ```css
 :root {
-  --paper: #fafaf8;
-  --ink: #0a0a0a;
-  --grey-1: #f0f0ee;
-  --grey-2: #d4d4d2;
-  --grey-3: #737373;
-  --accent: #002FA7;
-  --accent-on: #ffffff;
-  --line: rgba(10, 10, 10, 0.14);
+  --base: #0b1018;
+  --surface: #111823;
+  --surface-raised: #151e2a;
+  --surface-muted: #1b2634;
+  --ink: #eef6f5;
+  --muted: #9aabb6;
+  --line: #2a3746;
+  --line-strong: #46586a;
+  --accent: #4ed8c2;
+  --accent-ink: #071512;
+  --warning: #f0b866;
+  --danger: #ff7c88;
+  --focus: #75e5d2;
 }
 ```
 
 The skill includes `assets/decision-map-seed.html` as a minimal starting point
-for Guizang Swiss decision maps. Use it when the current project has no stronger
-local scaffold. The seed provides stable CSS tokens, responsive panel layout,
-edge-mode controls, fit/zoom/export affordances, and the canonical model slot so
-agents do not repeatedly rebuild the same shell.
+for Night Signal decision maps. Use it when the current project has no stronger
+local scaffold. The seed provides stable semantic tokens, complete control
+states, responsive drawers, edge-mode controls, fit/zoom/export affordances,
+safe persistence, and the canonical model slot.
 
-For Swiss style, keep one accent color per artifact. Do not mix IKB, lemon
-yellow, lemon green, and safety orange in the same map as peer accents. Different
-layers should be distinguished primarily by layout, labels, line style, icons,
-or subtle tints, not by turning the UI into a rainbow.
+Use Precision Grid as the light adapter when printing, daylight conditions, or
+an explicit brief favors it. Use Editorial Ledger only when a strategy or
+narrative map benefits from warmer surfaces and stronger reading hierarchy.
+Adapters may change palette, typography character, radii, and panel treatment;
+they may not weaken the interaction or accessibility contract.
 
 Avoid:
 
@@ -484,7 +481,9 @@ Avoid:
 - decorative cards inside cards;
 - text explaining how to use the UI inside the artifact;
 - generic SaaS landing page visuals;
-- single-hue palettes that make layers hard to distinguish.
+- single-hue palettes that make layers hard to distinguish;
+- cyan glow halos, glass panels, or saturated inactive nodes masquerading as
+  technical depth.
 
 ## Review Protocol
 
@@ -635,7 +634,8 @@ The final response should only claim success after checking:
 - later-stage components do not act as prerequisites for earlier-stage gates
   unless explicitly marked as retrospective review;
 - the page renders nonblank in a browser or equivalent renderer;
-- the UI follows Guizang-derived style rules without horizontal deck pagination;
+- the UI uses Night Signal or a justified adapter without horizontal deck
+  pagination or decorative dark chrome;
 - node click, edge click, single-click layer expand/collapse, filters, search,
   and export work;
 - for large maps, left/right panel collapse, fit-to-view, zoom in/out, and zoom

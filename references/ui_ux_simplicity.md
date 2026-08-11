@@ -144,15 +144,28 @@ Apply baseline design-system behavior:
 
 ## Visual Style Adapter
 
-Use Guizang Swiss International as the default surface language:
+Use **Night Signal** as the default surface language for sustained product and
+architecture work:
 
-- strict grid;
-- high contrast;
-- hairline dividers;
-- restrained accent;
-- compact metadata;
-- minimal shadows;
-- direct labels.
+- tinted dark neutrals rather than pure black or uncalibrated grey;
+- a second neutral surface for panels and toolbars;
+- one cyan accent for selection, focus, and primary actions;
+- amber for review risk and red only for destructive or blocking states;
+- compact sans-serif UI type, with mono reserved for IDs, counts, and data;
+- 12–14px node/panel radii, 8–10px control radii, and pills only for compact
+  status labels;
+- borders or soft offset shadows for elevation, never both on every surface;
+- 150–220ms state transitions, no page-load choreography, glow, or glass;
+- a map canvas that owns the highest contrast and largest area.
+
+Treat these as semantic constraints, not a palette costume. Every interactive
+primitive must have default, hover, active, disabled, and `:focus-visible`
+states. Keep inactive nodes quiet. Communicate selection and risk with border,
+line style, labels, or position as well as color.
+
+Use Precision Grid as the light adapter when printing, daylight use, or a user
+brief requires it. Use Editorial Ledger only for strategy/narrative maps where
+discussion and screenshot legibility matter more than maximum density.
 
 Do not inherit slide mechanics, hero pages, decorative cards, or horizontal deck
 pagination from presentation tools.

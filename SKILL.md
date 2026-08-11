@@ -169,18 +169,22 @@ nodes, edges, decisions, or review findings rather than appending loose prose.
 
 ## Visual Style
 
-Borrow visual discipline from `ckpxgfnksd-max/guizang-ppt-skill`
-(https://github.com/ckpxgfnksd-max/guizang-ppt-skill), not its horizontal deck
-interaction.
+Default product, architecture, engineering, data, and protocol maps to **Night
+Signal**, a low-light operating surface derived from Impeccable's product-UI
+discipline (https://github.com/pbakaus/impeccable): tinted dark neutrals, one
+cyan selection accent, amber risk, compact metadata, and a dominant canvas.
 
-Default for product, architecture, engineering, data, and protocol maps:
-Guizang Swiss International style: strict grid, high contrast, restrained
-accent color, hairline dividers, strong type hierarchy, compact metadata, and
-information-dense panels.
+Use the dark direction because teams inspect dense maps for sustained periods,
+not because technical products are automatically dark. Keep familiar controls,
+complete state behavior, restrained motion, and semantic tokens. Do not add
+glow, glass, decorative gradients, saturated inactive states, or monospace as a
+technical costume.
 
-Use the Guizang electronic magazine direction only when the map is primarily
-strategy, narrative, or culture. Even then, keep controls and graph labels
-plain, readable, and task-focused.
+Keep Guizang-derived information discipline: strict alignment, hairline
+relationships, direct labels, and strong hierarchy. Use a light Precision Grid
+adapter when daylight, printing, or accessibility evidence favors it. Use the
+editorial adapter only for strategy, narrative, or culture maps; controls and
+graph labels must remain task-focused.
 
 ## Source Vocabulary Discipline
 
@@ -246,7 +250,8 @@ The run is complete only when:
 12. Source-backed maps preserve provenance and uncertainty.
 13. Filters, search, tabs, collapse, and zoom do not leave stale hidden
     selections in the detail panel.
-14. The UI follows Guizang-derived visual discipline without becoming a deck.
+14. The UI uses Night Signal by default, or documents why another adapter fits
+    the use scene better; no deck mechanics or decorative dark chrome appear.
 15. The vocabulary pass finds no unintended imported terms.
 16. Static validation and browser checks have been run when available, and
     remaining limitations are stated in the final response.

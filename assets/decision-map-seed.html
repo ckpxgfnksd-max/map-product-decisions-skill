@@ -3,233 +3,1563 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Decision Map Seed</title>
+  <meta name="color-scheme" content="light dark">
+  <title>Decision Map UI Direction Lab</title>
   <style>
     :root {
-      --paper: #fafaf8;
-      --ink: #0a0a0a;
-      --grey-1: #f0f0ee;
-      --grey-2: #d4d4d2;
-      --grey-3: #737373;
-      --accent: #002FA7;
-      --accent-on: #ffffff;
-      --line: rgba(10, 10, 10, 0.14);
-      --mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, monospace;
-      --sans: Inter, "Helvetica Neue", Helvetica, "Noto Sans SC", Arial, sans-serif;
+      --font-ui: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+      --font-data: "SFMono-Regular", Menlo, Consolas, monospace;
+      --font-display: var(--font-ui);
+      --base: #f2f4f7;
+      --surface: #fbfcfd;
+      --surface-raised: #ffffff;
+      --surface-muted: #e9edf3;
+      --ink: #172033;
+      --muted: #667085;
+      --faint: #8d96a6;
+      --line: #cbd2dc;
+      --line-strong: #9ca6b6;
+      --accent: #1747d1;
+      --accent-ink: #ffffff;
+      --accent-soft: #e7ecff;
+      --warning: #b15a13;
+      --warning-soft: #fff0dd;
+      --danger: #b42335;
+      --danger-soft: #fde9ec;
+      --success: #19714a;
+      --focus: #1747d1;
+      --grid: rgba(23, 32, 51, 0.065);
+      --edge: #667085;
+      --edge-strong: #29344a;
+      --radius-control: 4px;
+      --radius-panel: 0px;
+      --radius-node: 4px;
+      --shadow-panel: none;
+      --shadow-node: 0 1px 0 rgba(23, 32, 51, 0.08);
+      --toolbar-h: 52px;
+      --node-w: 196px;
+      --node-h: 108px;
+      --motion: 180ms cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+
     body {
       margin: 0;
-      min-height: 100vh;
-      background: var(--paper);
+      min-width: 320px;
+      background: var(--base);
       color: var(--ink);
-      font-family: var(--sans);
-      letter-spacing: 0;
+      font-family: var(--font-ui);
+      font-size: 14px;
+      line-height: 1.45;
+      accent-color: var(--accent);
+      transition: background-color var(--motion), color var(--motion);
     }
 
-    .app-shell {
-      display: grid;
-      grid-template-columns: minmax(220px, 280px) minmax(0, 1fr) minmax(260px, 360px);
-      min-height: 100vh;
-      border-top: 1px solid var(--ink);
+    body[data-direction="night"] {
+      --font-ui: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
+      --base: #0b1018;
+      --surface: #111823;
+      --surface-raised: #151e2a;
+      --surface-muted: #1b2634;
+      --ink: #eef6f5;
+      --muted: #9aabb6;
+      --faint: #71828f;
+      --line: #2a3746;
+      --line-strong: #46586a;
+      --accent: #4ed8c2;
+      --accent-ink: #071512;
+      --accent-soft: #153d3a;
+      --warning: #f0b866;
+      --warning-soft: #3b2d1a;
+      --danger: #ff7c88;
+      --danger-soft: #43232a;
+      --success: #62d69d;
+      --focus: #75e5d2;
+      --grid: rgba(161, 201, 211, 0.065);
+      --edge: #718796;
+      --edge-strong: #c0d7dc;
+      --radius-control: 10px;
+      --radius-panel: 14px;
+      --radius-node: 12px;
+      --shadow-panel: 0 18px 48px rgba(1, 5, 10, 0.24);
+      --shadow-node: 0 12px 28px rgba(1, 5, 10, 0.22);
     }
 
-    .panel {
-      min-width: 0;
-      border-right: 1px solid var(--line);
-      padding: 16px;
-      overflow: auto;
+    body[data-direction="ledger"] {
+      --font-ui: "Avenir Next", Avenir, "Segoe UI", sans-serif;
+      --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+      --base: #eae3d7;
+      --surface: #f8f3e9;
+      --surface-raised: #fffaf0;
+      --surface-muted: #e4dccd;
+      --ink: #29231d;
+      --muted: #70675c;
+      --faint: #958b7d;
+      --line: #c8bcaa;
+      --line-strong: #918471;
+      --accent: #ba3a2c;
+      --accent-ink: #fffaf0;
+      --accent-soft: #f4ddd5;
+      --warning: #9d5b16;
+      --warning-soft: #f5e6cb;
+      --danger: #a62937;
+      --danger-soft: #f5dce0;
+      --success: #356c4f;
+      --focus: #ba3a2c;
+      --grid: rgba(65, 48, 31, 0.07);
+      --edge: #827766;
+      --edge-strong: #3f352b;
+      --radius-control: 2px;
+      --radius-panel: 0px;
+      --radius-node: 2px;
+      --shadow-panel: none;
+      --shadow-node: 0 7px 18px rgba(63, 43, 25, 0.07);
     }
 
-    .panel.right { border-right: 0; border-left: 1px solid var(--line); }
+    ::selection { background: var(--accent); color: var(--accent-ink); }
 
-    .map-stage {
-      position: relative;
-      min-width: 0;
-      overflow: hidden;
-      background-image:
-        linear-gradient(var(--line) 1px, transparent 1px),
-        linear-gradient(90deg, var(--line) 1px, transparent 1px);
-      background-size: 40px 40px;
-    }
+    * { scrollbar-color: var(--line-strong) var(--surface); scrollbar-width: thin; }
 
-    .toolbar {
-      position: sticky;
-      top: 0;
-      z-index: 3;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      padding: 10px;
-      border-bottom: 1px solid var(--line);
-      background: rgba(250, 250, 248, 0.94);
-      backdrop-filter: blur(8px);
-    }
+    button, input, select, textarea { font: inherit; }
 
-    button, select, input {
-      min-height: 32px;
-      border: 1px solid var(--ink);
-      border-radius: 0;
-      background: var(--paper);
+    button, input, select, textarea {
       color: var(--ink);
-      font: 500 12px var(--mono);
-      text-transform: uppercase;
     }
 
-    button[aria-pressed="true"], .is-active {
-      background: var(--accent);
-      color: var(--accent-on);
-      border-color: var(--accent);
-    }
-
-    .canvas {
-      position: relative;
-      min-width: 960px;
-      min-height: 680px;
-      transform-origin: 0 0;
-    }
-
-    .node {
-      position: absolute;
-      width: 180px;
-      min-height: 92px;
-      padding: 12px;
-      border: 1px solid var(--ink);
-      background: var(--paper);
-      cursor: pointer;
-    }
-
-    .node[aria-selected="true"] {
-      outline: 3px solid var(--accent);
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible,
+    [tabindex="0"]:focus-visible {
+      outline: 3px solid color-mix(in srgb, var(--focus) 34%, transparent);
       outline-offset: 2px;
     }
 
-    .node-title {
-      margin: 0 0 10px;
-      font-size: 15px;
-      line-height: 1.18;
-      font-weight: 650;
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: 0.48; }
+
+    .icon {
+      width: 17px;
+      height: 17px;
+      flex: 0 0 auto;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
-    .node-meta {
-      font: 500 10px var(--mono);
-      color: var(--grey-3);
+    .workspace {
+      position: relative;
+      display: grid;
+      grid-template-columns: 252px minmax(0, 1fr) 340px;
+      gap: 0;
+      min-height: 100vh;
+      background: var(--base);
+      transition: background-color var(--motion);
+    }
+
+    body[data-direction="night"] .workspace {
+      grid-template-columns: 268px minmax(0, 1fr) 354px;
+      gap: 12px;
+      padding: 12px;
+    }
+
+    body[data-direction="ledger"] .workspace {
+      grid-template-columns: 226px minmax(0, 1fr) 390px;
+    }
+
+    .workspace.left-collapsed { grid-template-columns: 0 minmax(0, 1fr) 340px; }
+    .workspace.right-collapsed { grid-template-columns: 252px minmax(0, 1fr) 0; }
+    .workspace.left-collapsed.right-collapsed { grid-template-columns: 0 minmax(0, 1fr) 0; }
+    body[data-direction="night"] .workspace.left-collapsed { grid-template-columns: 0 minmax(0, 1fr) 354px; }
+    body[data-direction="night"] .workspace.right-collapsed { grid-template-columns: 268px minmax(0, 1fr) 0; }
+    body[data-direction="night"] .workspace.left-collapsed.right-collapsed { grid-template-columns: 0 minmax(0, 1fr) 0; }
+    body[data-direction="ledger"] .workspace.left-collapsed { grid-template-columns: 0 minmax(0, 1fr) 390px; }
+    body[data-direction="ledger"] .workspace.right-collapsed { grid-template-columns: 226px minmax(0, 1fr) 0; }
+    body[data-direction="ledger"] .workspace.left-collapsed.right-collapsed { grid-template-columns: 0 minmax(0, 1fr) 0; }
+
+    .panel {
+      min-width: 0;
+      overflow: auto;
+      background: var(--surface);
+      transition: opacity var(--motion), transform var(--motion), background-color var(--motion), border-color var(--motion);
+    }
+
+    .left-panel { border-right: 1px solid var(--line); }
+    .right-panel { position: relative; border-left: 1px solid var(--line); }
+
+    body[data-direction="night"] .panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-panel);
+      box-shadow: var(--shadow-panel);
+    }
+
+    .workspace.left-collapsed .left-panel,
+    .workspace.right-collapsed .right-panel {
+      opacity: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .panel-inner { padding: 18px 16px 28px; }
+
+    .panel-heading {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 34px;
+      margin-bottom: 18px;
+    }
+
+    .panel-heading h2,
+    .detail-title {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 20px;
+      line-height: 1.15;
+      letter-spacing: -0.018em;
+    }
+
+    .icon-button,
+    .toolbar-button {
+      min-width: 38px;
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-control);
+      background: var(--surface-raised);
+      color: var(--ink);
+      transition: background-color var(--motion), border-color var(--motion), color var(--motion), transform var(--motion);
+    }
+
+    .icon-button:hover,
+    .toolbar-button:hover { border-color: var(--line-strong); background: var(--surface-muted); }
+    .icon-button:active,
+    .toolbar-button:active { transform: translateY(1px); }
+
+    .toolbar-button[aria-pressed="true"] {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--accent-ink);
+    }
+
+    .toolbar-button .button-label { font-size: 12px; font-weight: 650; }
+
+    .close-panel { display: none; }
+
+    .field-label,
+    .section-label {
+      display: block;
+      margin: 0 0 7px;
+      color: var(--muted);
+      font: 650 10px/1.2 var(--font-data);
+      letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
-    svg.edges {
+    .search-field {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .search-field .icon {
       position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      overflow: visible;
+      left: 11px;
+      top: 12px;
+      width: 15px;
+      height: 15px;
+      color: var(--muted);
       pointer-events: none;
     }
 
-    .edge-path {
+    .search-field input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-control);
+      background: var(--surface-raised);
+    }
+
+    .search-field input {
+      min-height: 40px;
+      padding: 8px 10px 8px 36px;
+    }
+
+    .search-field input::placeholder,
+    textarea::placeholder { color: var(--faint); }
+
+    .filter-group { margin-bottom: 22px; }
+
+    .filter-row {
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--ink);
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .filter-row span:first-of-type { flex: 1; }
+
+    .filter-row input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+    }
+
+    .filter-count {
+      color: var(--muted);
+      font: 600 11px/1 var(--font-data);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .decision-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .decision-row {
+      display: grid;
+      gap: 7px;
+      padding: 10px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .decision-row:first-child { border-top: 0; }
+
+    .decision-title {
+      margin: 0;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 650;
+      line-height: 1.35;
+    }
+
+    .decision-row select {
+      min-height: 34px;
+      padding: 6px 28px 6px 8px;
+      font-size: 12px;
+    }
+
+    .map-stage {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr);
+      overflow: hidden;
+      background: var(--surface);
+      border-radius: var(--radius-panel);
+      box-shadow: var(--shadow-panel);
+      transition: background-color var(--motion);
+    }
+
+    body:not([data-direction="night"]) .map-stage { border-bottom: 1px solid var(--line); }
+
+    .map-heading {
+      display: grid;
+      gap: 4px;
+      padding: 15px 18px 13px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface-raised);
+    }
+
+    .map-heading h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.15;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .map-heading p {
+      max-width: 72ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .canvas-empty {
+      position: absolute;
+      left: 50%;
+      top: 48%;
+      width: min(360px, calc(100vw - 48px));
+      padding: 16px;
+      border: 1px dashed var(--line-strong);
+      border-radius: var(--radius-node);
+      color: var(--muted);
+      background: var(--surface-raised);
+      text-align: center;
+    }
+
+    .canvas-empty strong {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--ink);
+      font-size: 14px;
+    }
+
+    .toolbar {
+      position: relative;
+      z-index: 8;
+      min-height: var(--toolbar-h);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      background: var(--surface-raised);
+      border-bottom: 1px solid var(--line);
+    }
+
+    body[data-direction="night"] .toolbar {
+      margin: 8px 8px 0;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface-muted);
+    }
+
+    body[data-direction="ledger"] .toolbar {
+      padding-left: 16px;
+      border-bottom-color: var(--line-strong);
+    }
+
+    .toolbar-group { display: flex; gap: 6px; align-items: center; }
+    .toolbar-spacer { flex: 1 1 20px; }
+    .zoom-readout { min-width: 44px; color: var(--muted); font: 650 11px/1 var(--font-data); text-align: center; }
+
+    .map-viewport {
+      position: relative;
+      min-height: 660px;
+      overflow: hidden;
+      cursor: grab;
+      touch-action: none;
+      background-color: var(--surface);
+      background-image:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+
+    .map-viewport.is-dragging { cursor: grabbing; }
+
+    body[data-direction="night"] .map-viewport {
+      margin: 8px;
+      border-radius: 10px;
+      background-size: 28px 28px;
+    }
+
+    body[data-direction="ledger"] .map-viewport {
+      background-image: linear-gradient(var(--grid) 1px, transparent 1px);
+      background-size: 100% 36px;
+    }
+
+    .canvas {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1320px;
+      height: 740px;
+      transform-origin: 0 0;
+      will-change: transform;
+    }
+
+    .layer-label {
+      position: absolute;
+      left: 30px;
+      min-width: 88px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid var(--line-strong);
+      color: var(--muted);
+      font: 650 10px/1 var(--font-data);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    .layer-label[data-layer="model"] { top: 78px; }
+    .layer-label[data-layer="interaction"] { top: 302px; }
+    .layer-label[data-layer="governance"] { top: 518px; }
+
+    .edges {
+      position: absolute;
+      inset: 0;
+      width: 1320px;
+      height: 740px;
+      overflow: visible;
+    }
+
+    .edge-line {
       fill: none;
-      stroke: var(--ink);
-      stroke-width: 1.4;
+      stroke: var(--edge);
+      stroke-width: 1.5;
+      vector-effect: non-scaling-stroke;
+      transition: stroke var(--motion), opacity var(--motion);
+    }
+
+    .edge[data-type="audits"] .edge-line,
+    .edge[data-type="protects"] .edge-line { stroke-dasharray: 7 6; }
+
+    .edge[data-type="constrains"] .edge-line { stroke-dasharray: 2 5; }
+
+    .edge-hit {
+      fill: none;
+      stroke: transparent;
+      stroke-width: 16;
       pointer-events: stroke;
       cursor: pointer;
     }
 
-    .edge-path.secondary { stroke: var(--grey-3); stroke-dasharray: 4 5; }
-    .edge-path.hidden { display: none; pointer-events: none; }
-    .edge-path.selected { stroke: var(--accent); stroke-width: 2.5; }
+    .edge.is-hidden { display: none; pointer-events: none; }
+    .edge.is-muted { opacity: 0.18; }
+    .edge.is-related .edge-line { stroke: var(--edge-strong); stroke-width: 2.1; }
+    .edge.is-selected .edge-line { stroke: var(--accent); stroke-width: 2.8; }
 
-    .kicker {
-      margin: 0 0 8px;
-      font: 600 11px var(--mono);
-      text-transform: uppercase;
-      color: var(--accent);
+    .edge-label rect {
+      fill: var(--surface-raised);
+      stroke: var(--line);
+      stroke-width: 1;
+      rx: var(--radius-control);
     }
 
-    h1, h2, h3 { margin: 0; letter-spacing: 0; }
-    h1 { font-size: 30px; line-height: 0.95; font-weight: 300; }
-    h2 { font-size: 18px; line-height: 1.1; font-weight: 600; }
-    p { line-height: 1.45; }
+    .edge-label text {
+      fill: var(--muted);
+      font: 650 10px/1 var(--font-data);
+      letter-spacing: 0.02em;
+      text-anchor: middle;
+      dominant-baseline: middle;
+    }
+
+    .edge.is-selected .edge-label rect { fill: var(--accent); stroke: var(--accent); }
+    .edge.is-selected .edge-label text { fill: var(--accent-ink); }
+
+    .node {
+      position: absolute;
+      width: var(--node-w);
+      height: var(--node-h);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 7px;
+      padding: 13px 14px 12px;
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius-node);
+      background: var(--surface-raised);
+      color: var(--ink);
+      box-shadow: var(--shadow-node);
+      text-align: left;
+      transition: border-color var(--motion), background-color var(--motion), box-shadow var(--motion), color var(--motion), opacity var(--motion), transform var(--motion);
+    }
+
+    .node:hover { border-color: var(--accent); transform: translateY(-2px); }
+
+    .node[aria-selected="true"] {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+      box-shadow: 0 0 0 2px var(--accent);
+    }
+
+    body[data-direction="night"] .node[aria-selected="true"] {
+      background: var(--accent-soft);
+      box-shadow: 0 0 0 1px var(--accent), var(--shadow-node);
+    }
+
+    .node.is-muted { opacity: 0.22; }
+    .node.is-hidden { display: none; }
+
+    .node-topline {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .node-id {
+      color: var(--muted);
+      font: 650 9px/1 var(--font-data);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .risk-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--warning);
+    }
+
+    .node-title {
+      align-self: center;
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.16;
+      letter-spacing: -0.012em;
+    }
+
+    .node-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--muted);
+      font: 600 9px/1 var(--font-data);
+      text-transform: uppercase;
+    }
+
+    .priority-mark {
+      width: 18px;
+      height: 2px;
+      background: var(--line-strong);
+    }
+
+    .priority-mark[data-priority="now"],
+    .priority-mark[data-priority="gate"] { background: var(--accent); }
+    .priority-mark[data-priority="next"] { background: var(--warning); }
+
+    .right-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .tab-button {
+      min-height: 46px;
+      border: 0;
+      border-right: 1px solid var(--line);
+      border-radius: 0;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .tab-button:last-child { border-right: 0; }
+
+    .tab-button[aria-selected="true"] {
+      background: var(--surface-raised);
+      color: var(--ink);
+      box-shadow: inset 0 -2px 0 var(--accent);
+    }
+
+    .detail-body { padding: 18px 18px 30px; }
+
+    .detail-empty {
+      min-height: 250px;
+      display: grid;
+      align-content: center;
+      gap: 10px;
+      color: var(--muted);
+    }
+
+    .detail-empty p { max-width: 30ch; margin: 0; }
+
+    .detail-kind {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      min-height: 24px;
+      margin-bottom: 10px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: var(--surface-muted);
+      color: var(--muted);
+      font: 650 10px/1 var(--font-data);
+      text-transform: uppercase;
+    }
+
+    .detail-summary { margin: 11px 0 20px; color: var(--muted); }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      margin-bottom: 20px;
+      background: var(--line);
+      border: 1px solid var(--line);
+    }
+
+    .meta-cell { min-height: 58px; padding: 10px; background: var(--surface-raised); }
+    .meta-cell strong { display: block; font-size: 12px; font-weight: 700; }
+
+    .detail-section { margin-top: 20px; }
+
+    .detail-list {
+      margin: 0;
+      padding-left: 17px;
+      color: var(--ink);
+    }
+
+    .detail-list li { margin: 0 0 7px; }
+
+    .relation-list { display: grid; gap: 7px; }
+
+    .relation-button,
+    .review-link {
+      width: 100%;
+      min-height: 38px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 9px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-control);
+      background: var(--surface-raised);
+      color: var(--ink);
+      text-align: left;
+      font-size: 12px;
+    }
+
+    .relation-button span:last-child { color: var(--muted); font: 600 9px/1 var(--font-data); text-transform: uppercase; }
+
+    textarea {
+      min-height: 92px;
+      resize: vertical;
+      padding: 10px;
+      line-height: 1.4;
+    }
+
+    .priority-select { min-height: 38px; padding: 7px 30px 7px 9px; }
+
+    .review-list { display: grid; gap: 12px; }
+
+    .review-item {
+      padding: 13px 0 15px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .review-item:first-child { padding-top: 0; }
+
+    .review-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .review-area { font: 700 10px/1 var(--font-data); text-transform: uppercase; letter-spacing: 0.06em; }
+
+    .severity {
+      padding: 4px 7px;
+      border-radius: 999px;
+      font: 700 9px/1 var(--font-data);
+      text-transform: uppercase;
+    }
+
+    .severity.high { background: var(--danger-soft); color: var(--danger); }
+    .severity.medium { background: var(--warning-soft); color: var(--warning); }
+    .severity.low { background: var(--accent-soft); color: var(--accent); }
+
+    .review-item p { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
+    .review-links { display: flex; flex-wrap: wrap; gap: 6px; }
+    .review-link { width: auto; min-height: 32px; padding: 6px 8px; }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      z-index: 30;
+      max-width: min(420px, calc(100vw - 32px));
+      padding: 10px 13px;
+      border-radius: var(--radius-control);
+      background: var(--ink);
+      color: var(--surface-raised);
+      box-shadow: 0 10px 30px rgba(11, 16, 24, 0.18);
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 10px);
+      transition: opacity var(--motion), transform var(--motion);
+      font-size: 12px;
+    }
+
+    .toast.is-visible { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (max-width: 1160px) {
+      .workspace,
+      body[data-direction="night"] .workspace,
+      body[data-direction="ledger"] .workspace { grid-template-columns: 220px minmax(0, 1fr) 310px; }
+      .workspace.left-collapsed,
+      body[data-direction="night"] .workspace.left-collapsed,
+      body[data-direction="ledger"] .workspace.left-collapsed { grid-template-columns: 0 minmax(0, 1fr) 310px; }
+      .workspace.right-collapsed,
+      body[data-direction="night"] .workspace.right-collapsed,
+      body[data-direction="ledger"] .workspace.right-collapsed { grid-template-columns: 220px minmax(0, 1fr) 0; }
+      .workspace.left-collapsed.right-collapsed,
+      body[data-direction="night"] .workspace.left-collapsed.right-collapsed,
+      body[data-direction="ledger"] .workspace.left-collapsed.right-collapsed { grid-template-columns: 0 minmax(0, 1fr) 0; }
+    }
 
     @media (max-width: 860px) {
-      .app-shell { grid-template-columns: 1fr; }
-      .panel, .panel.right { border: 0; border-bottom: 1px solid var(--line); max-height: 36vh; }
-      .canvas { min-width: 760px; }
+      .workspace,
+      body[data-direction="night"] .workspace,
+      body[data-direction="ledger"] .workspace,
+      .workspace.left-collapsed,
+      .workspace.right-collapsed,
+      .workspace.left-collapsed.right-collapsed,
+      body[data-direction="night"] .workspace.left-collapsed,
+      body[data-direction="night"] .workspace.right-collapsed,
+      body[data-direction="night"] .workspace.left-collapsed.right-collapsed,
+      body[data-direction="ledger"] .workspace.left-collapsed,
+      body[data-direction="ledger"] .workspace.right-collapsed,
+      body[data-direction="ledger"] .workspace.left-collapsed.right-collapsed {
+        display: block;
+        min-height: 720px;
+        padding: 0;
+      }
+
+      .map-stage { min-height: 720px; border-radius: 0; }
+      body[data-direction="night"] .map-stage { margin: 0; }
+
+      .panel {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        z-index: 20;
+        width: min(88vw, 360px);
+        border-radius: 0 !important;
+        box-shadow: 0 20px 50px rgba(11, 16, 24, 0.24) !important;
+      }
+
+      .left-panel { left: 0; transform: translateX(0); }
+      .right-panel { right: 0; transform: translateX(0); }
+      .workspace.left-collapsed .left-panel { transform: translateX(-102%); opacity: 1; }
+      .workspace.right-collapsed .right-panel { transform: translateX(102%); opacity: 1; }
+      .close-panel { display: inline-flex; }
+      .map-viewport { min-height: 666px; }
+      .toolbar-spacer { display: none; }
+      .toolbar { align-content: center; }
+      .toolbar-button .button-label.hide-narrow { display: none; }
+    }
+
+    @media (max-width: 540px) {
+      .toolbar { gap: 5px; padding: 6px; }
+      .toolbar-button, .icon-button { min-width: 40px; min-height: 40px; padding: 0 8px; }
+      .toolbar-group { gap: 4px; }
+      .zoom-readout { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
     }
   </style>
 </head>
-<body>
-  <div class="app-shell" data-map-shell>
-    <aside class="panel" data-left-panel>
-      <p class="kicker">Decision Map</p>
-      <h1 data-map-title>Replace With Map Title</h1>
-      <div data-filters></div>
+<body data-direction="night">
+  <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path></symbol>
+    <symbol id="i-sidebar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M9 4v16"></path></symbol>
+    <symbol id="i-inspect" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M15 4v16"></path></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"></path></symbol>
+    <symbol id="i-fit" viewBox="0 0 24 24"><path d="M8 4H4v4M16 4h4v4M8 20H4v-4M16 20h4v-4"></path></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M5 7v5h5"></path><path d="M6.5 16a7 7 0 1 0-.8-8.2L5 9"></path></symbol>
+    <symbol id="i-export" viewBox="0 0 24 24"><path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 20h14"></path></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"></path></symbol>
+  </svg>
+
+
+  <div class="workspace" data-workspace>
+    <aside class="panel left-panel" aria-label="Filters and decisions">
+      <div class="panel-inner">
+        <div class="panel-heading">
+          <h2>Map structure</h2>
+          <button class="icon-button close-panel" type="button" data-action="close-left" aria-label="Close filter panel"><svg class="icon"><use href="#i-close"></use></svg></button>
+        </div>
+
+        <label class="search-field">
+          <span class="field-label">Search nodes</span>
+          <svg class="icon"><use href="#i-search"></use></svg>
+          <input type="search" placeholder="Title, owner, interface" data-search>
+        </label>
+
+        <section class="filter-group" aria-labelledby="layers-label">
+          <h3 class="section-label" id="layers-label">Layers</h3>
+          <div data-layer-filters></div>
+        </section>
+
+        <section aria-labelledby="decisions-label">
+          <h3 class="section-label" id="decisions-label">Decision ledger</h3>
+          <div class="decision-list" data-decision-list></div>
+        </section>
+      </div>
     </aside>
 
     <main class="map-stage">
-      <div class="toolbar" data-toolbar>
-        <button type="button" data-action="fit">Fit</button>
-        <button type="button" data-action="zoom-in">+</button>
-        <button type="button" data-action="zoom-out">-</button>
-        <button type="button" data-action="reset">Reset</button>
-        <button type="button" data-edge-mode="spine" aria-pressed="true">Spine</button>
-        <button type="button" data-edge-mode="focus">Focus</button>
-        <button type="button" data-edge-mode="all">All</button>
-        <button type="button" data-action="export">Export JSON</button>
+      <div class="map-heading">
+        <h1 data-map-title>Decision Map Seed</h1>
+        <p data-map-question>Replace the model and state the first-viewport decision question.</p>
       </div>
-      <section class="canvas" data-canvas>
-        <svg class="edges" data-edges aria-hidden="true"></svg>
-        <div data-nodes></div>
-      </section>
+      <div class="toolbar" aria-label="Map controls">
+        <button class="toolbar-button" type="button" data-action="toggle-left" aria-label="Toggle filter panel" aria-pressed="true"><svg class="icon"><use href="#i-sidebar"></use></svg></button>
+
+        <div class="toolbar-group" role="group" aria-label="Relationship density">
+          <button class="toolbar-button" type="button" data-edge-mode="overview" aria-pressed="true"><span class="button-label">Overview</span></button>
+          <button class="toolbar-button" type="button" data-edge-mode="focus" aria-pressed="false"><span class="button-label">Focus</span></button>
+          <button class="toolbar-button" type="button" data-edge-mode="all" aria-pressed="false"><span class="button-label">All</span></button>
+        </div>
+
+        <div class="toolbar-spacer"></div>
+
+        <div class="toolbar-group" role="group" aria-label="Zoom controls">
+          <button class="toolbar-button" type="button" data-action="fit" aria-label="Fit map to view"><svg class="icon"><use href="#i-fit"></use></svg><span class="button-label hide-narrow">Fit</span></button>
+          <button class="toolbar-button" type="button" data-action="zoom-out" aria-label="Zoom out"><svg class="icon"><use href="#i-minus"></use></svg></button>
+          <output class="zoom-readout" data-zoom-readout>100%</output>
+          <button class="toolbar-button" type="button" data-action="zoom-in" aria-label="Zoom in"><svg class="icon"><use href="#i-plus"></use></svg></button>
+          <button class="toolbar-button" type="button" data-action="reset-view" aria-label="Reset zoom and position"><svg class="icon"><use href="#i-reset"></use></svg></button>
+        </div>
+
+        <button class="toolbar-button" type="button" data-action="export"><svg class="icon"><use href="#i-export"></use></svg><span class="button-label hide-narrow">Export JSON</span></button>
+        <button class="toolbar-button" type="button" data-action="toggle-right" aria-label="Toggle inspector panel" aria-pressed="true"><svg class="icon"><use href="#i-inspect"></use></svg></button>
+      </div>
+
+      <div class="map-viewport" data-map-viewport aria-label="Decision dependency graph">
+        <div class="canvas" data-canvas>
+          <svg class="edges" data-edges role="group" aria-label="Typed relationships"></svg>
+          <div data-nodes></div>
+        </div>
+      </div>
     </main>
 
-    <aside class="panel right" data-detail-panel>
-      <p class="kicker">Selection</p>
-      <h2 data-detail-title>No node selected</h2>
-      <div data-detail-body></div>
+    <aside class="panel right-panel" aria-label="Inspector and reviews">
+      <div class="right-tabs" role="tablist" aria-label="Detail panel">
+        <button class="tab-button" type="button" role="tab" data-right-tab="inspect" aria-selected="true">Inspect</button>
+        <button class="tab-button" type="button" role="tab" data-right-tab="reviews" aria-selected="false">Reviews <span data-review-count></span></button>
+      </div>
+      <div class="detail-body" data-detail-body></div>
+      <button class="icon-button close-panel" type="button" data-action="close-right" aria-label="Close inspector panel" style="position:absolute;right:12px;top:7px"><svg class="icon"><use href="#i-close"></use></svg></button>
     </aside>
   </div>
 
-  <script>
-    const storageKey = "decision-map-seed-state";
+  <div class="toast" role="status" aria-live="polite" data-toast></div>
 
-    function loadTeamState() {
+  <script>
+    const storageKey = "decision-map-night-signal-state";
+    const canvasSize = { width: 1320, height: 740 };
+    const nodeSize = { width: 196, height: 108 };
+
+    // Replace this model. Keep meta, sources, nodes, edges, decisions, and
+    // reviews canonical; add stages/lanes when the selected grammar needs them.
+    const model = {
+      meta: {
+        title: "Decision Map Seed",
+        generatedAt: "YYYY-MM-DD",
+        version: 1,
+        mapGrammar: "dependency-graph",
+        firstViewportQuestion: "Replace with the dominant decision question.",
+        uiDirection: "night-signal",
+        sourceNotes: []
+      },
+      sources: [],
+      nodes: [],
+      edges: [],
+      decisions: [],
+      reviews: []
+    };
+
+    const nodeById = new Map(model.nodes.map(node => [node.id, node]));
+    const workspace = document.querySelector("[data-workspace]");
+    const nodesRoot = document.querySelector("[data-nodes]");
+    const edgesRoot = document.querySelector("[data-edges]");
+    const detailRoot = document.querySelector("[data-detail-body]");
+    const viewport = document.querySelector("[data-map-viewport]");
+    const canvas = document.querySelector("[data-canvas]");
+    const searchInput = document.querySelector("[data-search]");
+    const toast = document.querySelector("[data-toast]");
+    const zoomReadout = document.querySelector("[data-zoom-readout]");
+
+    function loadState() {
       try {
-        return JSON.parse(localStorage.getItem(storageKey) || "{}");
+        const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
+        return saved && typeof saved === "object" ? saved : {};
       } catch (error) {
         window.__decisionMapStorageError = String(error);
         return {};
       }
     }
 
-    function saveTeamState(nextState) {
+    const stored = loadState();
+    const state = {
+      direction: "night",
+      edgeMode: "overview",
+      selectedNode: null,
+      selectedEdge: null,
+      rightTab: "inspect",
+      query: "",
+      activeLayers: new Set(model.nodes.map(node => node.layer).filter(Boolean)),
+      scale: 1,
+      tx: 0,
+      ty: 0,
+      leftOpen: window.innerWidth > 860,
+      rightOpen: window.innerWidth > 860,
+      teamState: {
+        notes: stored.teamState?.notes || {},
+        priorityOverrides: stored.teamState?.priorityOverrides || {},
+        decisionStatus: stored.teamState?.decisionStatus || {}
+      }
+    };
+
+    let toastTimer = 0;
+    let dragState = null;
+
+    function safeSave() {
       try {
-        localStorage.setItem(storageKey, JSON.stringify(nextState));
+        localStorage.setItem(storageKey, JSON.stringify({
+          direction: state.direction,
+          teamState: state.teamState
+        }));
         return true;
       } catch (error) {
+        window.__decisionMapStorageError = String(error);
+        showToast("Could not save locally. Export JSON to preserve this state.");
         return false;
       }
     }
 
-    const teamState = loadTeamState();
+    function showToast(message) {
+      window.clearTimeout(toastTimer);
+      toast.textContent = message;
+      toast.classList.add("is-visible");
+      toastTimer = window.setTimeout(() => toast.classList.remove("is-visible"), 2600);
+    }
 
-    // Replace this model. Keep the canonical shape: meta, nodes, edges,
-    // decisions, reviews. Add stages/lanes/sources when the grammar needs them.
-    const model = {
-      meta: {
-        title: "Decision Map Seed",
-        generatedAt: "2026-06-24",
-        version: 1,
-        mapGrammar: "dependency-graph",
-        sourceNotes: []
-      },
-      nodes: [],
-      edges: [],
-      decisions: [],
-      reviews: [],
-      teamState
-    };
+    function effectivePriority(node) {
+      return state.teamState.priorityOverrides[node.id] || node.priority;
+    }
+
+    function isNodeVisible(node) {
+      if (!state.activeLayers.has(node.layer)) return false;
+      if (!state.query) return true;
+      const haystack = [node.title, node.owner, node.layer, ...node.interfaces].join(" ").toLowerCase();
+      return haystack.includes(state.query);
+    }
+
+    function isEdgeVisible(edge) {
+      const endpointsVisible = isNodeVisible(nodeById.get(edge.from)) && isNodeVisible(nodeById.get(edge.to));
+      if (!endpointsVisible) return false;
+      if (state.edgeMode === "all") return true;
+      if (state.edgeMode === "overview") return edge.essential;
+      return edge.essential || edge.from === state.selectedNode || edge.to === state.selectedNode || edge.id === state.selectedEdge;
+    }
+
+    function edgePath(edge) {
+      const from = nodeById.get(edge.from);
+      const to = nodeById.get(edge.to);
+      const fromCenter = { x: from.x + nodeSize.width / 2, y: from.y + nodeSize.height / 2 };
+      const toCenter = { x: to.x + nodeSize.width / 2, y: to.y + nodeSize.height / 2 };
+
+      if (Math.abs(toCenter.y - fromCenter.y) < 40) {
+        const sx = toCenter.x > fromCenter.x ? from.x + nodeSize.width : from.x;
+        const tx = toCenter.x > fromCenter.x ? to.x : to.x + nodeSize.width;
+        const sy = fromCenter.y;
+        const ty = toCenter.y;
+        const bend = Math.max(48, Math.abs(tx - sx) * 0.42);
+        const c1 = sx + (tx > sx ? bend : -bend);
+        const c2 = tx - (tx > sx ? bend : -bend);
+        return `M ${sx} ${sy} C ${c1} ${sy}, ${c2} ${ty}, ${tx} ${ty}`;
+      }
+
+      const downward = toCenter.y > fromCenter.y;
+      const sx = fromCenter.x;
+      const sy = downward ? from.y + nodeSize.height : from.y;
+      const tx = toCenter.x;
+      const ty = downward ? to.y : to.y + nodeSize.height;
+      const midY = sy + (ty - sy) / 2;
+      return `M ${sx} ${sy} C ${sx} ${midY}, ${tx} ${midY}, ${tx} ${ty}`;
+    }
+
+    function svgElement(name, attrs = {}) {
+      const element = document.createElementNS("http://www.w3.org/2000/svg", name);
+      Object.entries(attrs).forEach(([key, value]) => element.setAttribute(key, value));
+      return element;
+    }
+
+    function renderNodes() {
+      nodesRoot.replaceChildren();
+      if (!model.nodes.length) {
+        const empty = document.createElement("div");
+        empty.className = "canvas-empty";
+        empty.innerHTML = "<strong>No nodes yet</strong>Replace model.nodes[] and model.edges[] with the task-specific decision system.";
+        nodesRoot.append(empty);
+        return;
+      }
+      model.nodes.forEach(node => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "node";
+        button.dataset.nodeId = node.id;
+        button.style.left = `${node.x}px`;
+        button.style.top = `${node.y}px`;
+        button.setAttribute("aria-selected", String(state.selectedNode === node.id));
+        button.setAttribute("aria-label", `${node.title}, ${node.layer}, priority ${effectivePriority(node)}`);
+
+        if (!isNodeVisible(node)) button.classList.add("is-hidden");
+        if (state.selectedNode && state.selectedNode !== node.id) {
+          const related = model.edges.some(edge => (edge.from === state.selectedNode && edge.to === node.id) || (edge.to === state.selectedNode && edge.from === node.id));
+          if (!related) button.classList.add("is-muted");
+        }
+
+        const hasHighReview = model.reviews.some(review => review.severity === "high" && review.linkedNodes.includes(node.id));
+        button.innerHTML = `
+          <span class="node-topline">
+            <span class="node-id">${node.layer} · ${node.id}</span>
+            ${hasHighReview ? '<span class="risk-dot" aria-label="High-severity review"></span>' : ''}
+          </span>
+          <span class="node-title">${node.title}</span>
+          <span class="node-meta"><span>${node.owner}</span><span class="priority-mark" data-priority="${effectivePriority(node)}"></span></span>
+        `;
+        button.addEventListener("click", () => selectNode(node.id));
+        nodesRoot.append(button);
+      });
+    }
+
+    function renderEdges() {
+      edgesRoot.replaceChildren();
+      const defs = svgElement("defs");
+      const marker = svgElement("marker", { id: "arrow-head", markerWidth: "8", markerHeight: "8", refX: "7", refY: "4", orient: "auto", markerUnits: "strokeWidth" });
+      marker.append(svgElement("path", { d: "M 0 0 L 8 4 L 0 8 z", fill: "var(--edge)" }));
+      defs.append(marker);
+      edgesRoot.append(defs);
+
+      model.edges.forEach(edge => {
+        const group = svgElement("g", {
+          class: "edge",
+          "data-edge-id": edge.id,
+          "data-type": edge.type,
+          role: "button",
+          tabindex: "0",
+          "aria-label": `${edge.type}: ${nodeById.get(edge.from).title} to ${nodeById.get(edge.to).title}`
+        });
+
+        const visible = isEdgeVisible(edge);
+        if (!visible) group.classList.add("is-hidden");
+        if (state.selectedEdge === edge.id) group.classList.add("is-selected");
+        if (state.selectedNode && (edge.from === state.selectedNode || edge.to === state.selectedNode)) group.classList.add("is-related");
+        if (state.selectedNode && edge.from !== state.selectedNode && edge.to !== state.selectedNode) group.classList.add("is-muted");
+
+        const d = edgePath(edge);
+        const line = svgElement("path", { class: "edge-line", d, "marker-end": "url(#arrow-head)" });
+        const hit = svgElement("path", { class: "edge-hit", d });
+        group.append(line, hit);
+        edgesRoot.append(group);
+
+        if (visible && (state.edgeMode === "all" || state.selectedEdge === edge.id || edge.from === state.selectedNode || edge.to === state.selectedNode)) {
+          group.append(makeEdgeLabel(line, edge));
+        }
+
+        group.addEventListener("click", event => {
+          event.stopPropagation();
+          selectEdge(edge.id);
+        });
+        group.addEventListener("keydown", event => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            selectEdge(edge.id);
+          }
+        });
+      });
+    }
+
+    function makeEdgeLabel(path, edge) {
+      const group = svgElement("g", { class: "edge-label" });
+      const point = path.getPointAtLength(path.getTotalLength() / 2);
+      const width = Math.max(48, edge.label.length * 7 + 16);
+      const rect = svgElement("rect", { x: String(point.x - width / 2), y: String(point.y - 11), width: String(width), height: "22" });
+      const text = svgElement("text", { x: String(point.x), y: String(point.y + 0.5) });
+      text.textContent = edge.label;
+      group.append(rect, text);
+      return group;
+    }
+
+    function renderLayerFilters() {
+      const root = document.querySelector("[data-layer-filters]");
+      root.replaceChildren();
+      const layers = [...new Set(model.nodes.map(node => node.layer).filter(Boolean))];
+      layers.forEach(layer => {
+        const count = model.nodes.filter(node => node.layer === layer).length;
+        const label = document.createElement("label");
+        label.className = "filter-row";
+        label.innerHTML = `<input type="checkbox" ${state.activeLayers.has(layer) ? "checked" : ""}><span>${layer[0].toUpperCase() + layer.slice(1)}</span><span class="filter-count">${count}</span>`;
+        label.querySelector("input").addEventListener("change", event => {
+          if (event.target.checked) state.activeLayers.add(layer);
+          else state.activeLayers.delete(layer);
+          reconcileSelection();
+          renderGraph();
+        });
+        root.append(label);
+      });
+    }
+
+    function renderDecisionList() {
+      const root = document.querySelector("[data-decision-list]");
+      root.replaceChildren();
+      model.decisions.forEach(decision => {
+        const row = document.createElement("div");
+        row.className = "decision-row";
+        const title = document.createElement("p");
+        title.className = "decision-title";
+        title.textContent = decision.title;
+        const select = document.createElement("select");
+        select.setAttribute("aria-label", `Status for ${decision.title}`);
+        ["proposed", "accepted", "rejected", "blocked", "needs-review"].forEach(status => {
+          const option = document.createElement("option");
+          option.value = status;
+          option.textContent = status.replace("-", " ");
+          option.selected = (state.teamState.decisionStatus[decision.id] || decision.status) === status;
+          select.append(option);
+        });
+        select.addEventListener("change", () => {
+          state.teamState.decisionStatus[decision.id] = select.value;
+          safeSave();
+          showToast("Decision status saved locally.");
+        });
+        title.addEventListener("click", () => selectNode(decision.affects[0]));
+        title.style.cursor = "pointer";
+        row.append(title, select);
+        root.append(row);
+      });
+    }
+
+    function renderDetail() {
+      if (state.rightTab === "reviews") {
+        renderReviews();
+        return;
+      }
+
+      if (state.selectedNode) {
+        renderNodeDetail(nodeById.get(state.selectedNode));
+        return;
+      }
+
+      if (state.selectedEdge) {
+        renderEdgeDetail(model.edges.find(edge => edge.id === state.selectedEdge));
+        return;
+      }
+
+      detailRoot.innerHTML = `
+        <div class="detail-empty">
+          <h2 class="detail-title">Inspect impact</h2>
+          <p>Select a node or relationship. The inspector shows blockers, downstream effects, decisions, and risks without crowding the map.</p>
+          <p><strong>${model.nodes.length}</strong> nodes · <strong>${model.edges.length}</strong> typed relationships · <strong>${model.reviews.length}</strong> linked reviews</p>
+        </div>`;
+    }
+
+    function renderNodeDetail(node) {
+      const incoming = model.edges.filter(edge => edge.to === node.id);
+      const outgoing = model.edges.filter(edge => edge.from === node.id);
+      const priority = effectivePriority(node);
+      const note = state.teamState.notes[node.id] || "";
+      detailRoot.innerHTML = `
+        <span class="detail-kind">${node.layer} node</span>
+        <h2 class="detail-title">${node.title}</h2>
+        <p class="detail-summary">${node.summary}</p>
+        <div class="meta-grid">
+          <div class="meta-cell"><span class="field-label">Owner</span><strong>${node.owner}</strong></div>
+          <div class="meta-cell"><span class="field-label">Maturity</span><strong>${node.maturity}</strong></div>
+        </div>
+        <label>
+          <span class="field-label">Team priority</span>
+          <select class="priority-select" data-priority-editor>
+            ${["now", "next", "later", "monitor", "reject", "gate"].map(value => `<option value="${value}" ${priority === value ? "selected" : ""}>${value}</option>`).join("")}
+          </select>
+        </label>
+        <section class="detail-section"><h3 class="section-label">Decisions</h3>${listMarkup(node.decisions)}</section>
+        <section class="detail-section"><h3 class="section-label">Risks</h3>${listMarkup(node.risks)}</section>
+        <section class="detail-section"><h3 class="section-label">Open questions</h3>${listMarkup(node.openQuestions)}</section>
+        <section class="detail-section"><h3 class="section-label">Interfaces</h3>${listMarkup(node.interfaces)}</section>
+        <section class="detail-section"><h3 class="section-label">Relationships</h3><div class="relation-list" data-relation-list></div></section>
+        <label class="detail-section" style="display:block">
+          <span class="field-label">Team note</span>
+          <textarea data-note-editor placeholder="Record evidence, disagreement, or revisit condition.">${escapeHtml(note)}</textarea>
+        </label>
+      `;
+
+      detailRoot.querySelector("[data-priority-editor]").addEventListener("change", event => {
+        state.teamState.priorityOverrides[node.id] = event.target.value;
+        safeSave();
+        renderNodes();
+        showToast("Priority saved locally.");
+      });
+
+      const noteEditor = detailRoot.querySelector("[data-note-editor]");
+      noteEditor.addEventListener("change", () => {
+        state.teamState.notes[node.id] = noteEditor.value;
+        safeSave();
+        showToast("Note saved locally.");
+      });
+
+      const relationRoot = detailRoot.querySelector("[data-relation-list]");
+      [...incoming, ...outgoing].forEach(edge => {
+        const otherId = edge.from === node.id ? edge.to : edge.from;
+        const direction = edge.from === node.id ? "outgoing" : "incoming";
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "relation-button";
+        button.innerHTML = `<span>${edge.label} · ${nodeById.get(otherId).title}</span><span>${direction}</span>`;
+        button.addEventListener("click", () => selectEdge(edge.id));
+        relationRoot.append(button);
+      });
+    }
+
+    function renderEdgeDetail(edge) {
+      const from = nodeById.get(edge.from);
+      const to = nodeById.get(edge.to);
+      detailRoot.innerHTML = `
+        <span class="detail-kind">${edge.type} relationship</span>
+        <h2 class="detail-title">${from.title} → ${to.title}</h2>
+        <p class="detail-summary">${edge.impact}</p>
+        <div class="meta-grid">
+          <div class="meta-cell"><span class="field-label">Strength</span><strong>${edge.strength}</strong></div>
+          <div class="meta-cell"><span class="field-label">Overview</span><strong>${edge.essential ? "essential" : "focus only"}</strong></div>
+        </div>
+        <section class="detail-section"><h3 class="section-label">If removed</h3><p>${edge.ifRemoved}</p></section>
+        <section class="detail-section"><h3 class="section-label">Endpoints</h3><div class="relation-list">
+          <button class="relation-button" type="button" data-jump-node="${from.id}"><span>${from.title}</span><span>source</span></button>
+          <button class="relation-button" type="button" data-jump-node="${to.id}"><span>${to.title}</span><span>target</span></button>
+        </div></section>
+      `;
+      detailRoot.querySelectorAll("[data-jump-node]").forEach(button => button.addEventListener("click", () => selectNode(button.dataset.jumpNode)));
+    }
+
+    function renderReviews() {
+      detailRoot.innerHTML = `<div class="panel-heading"><h2>Linked reviews</h2><span class="filter-count">${model.reviews.length}</span></div><div class="review-list" data-review-list></div>`;
+      const root = detailRoot.querySelector("[data-review-list]");
+      model.reviews.forEach(review => {
+        const item = document.createElement("article");
+        item.className = "review-item";
+        item.innerHTML = `
+          <div class="review-meta"><span class="review-area">${review.area}</span><span class="severity ${review.severity}">${review.severity}</span></div>
+          <p>${review.finding}</p>
+          <div class="review-links"></div>`;
+        const links = item.querySelector(".review-links");
+        review.linkedNodes.forEach(nodeId => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "review-link";
+          button.textContent = nodeById.get(nodeId).title;
+          button.addEventListener("click", () => {
+            setRightTab("inspect");
+            selectNode(nodeId);
+          });
+          links.append(button);
+        });
+        root.append(item);
+      });
+    }
+
+    function listMarkup(items) {
+      return `<ul class="detail-list">${items.map(item => `<li>${item}</li>`).join("")}</ul>`;
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>'"]/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[character]);
+    }
+
+    function selectNode(id) {
+      state.selectedNode = id;
+      state.selectedEdge = null;
+      state.edgeMode = "focus";
+      state.rightOpen = true;
+      setRightTab("inspect", false);
+      syncShell();
+      renderAll();
+    }
+
+    function selectEdge(id) {
+      state.selectedEdge = id;
+      state.selectedNode = null;
+      state.edgeMode = "focus";
+      state.rightOpen = true;
+      setRightTab("inspect", false);
+      syncShell();
+      renderAll();
+    }
+
+    function reconcileSelection() {
+      if (state.selectedNode && !isNodeVisible(nodeById.get(state.selectedNode))) state.selectedNode = null;
+      if (state.selectedEdge) {
+        const edge = model.edges.find(item => item.id === state.selectedEdge);
+        if (!isEdgeVisible(edge)) state.selectedEdge = null;
+      }
+    }
+
+    function renderGraph() {
+      renderNodes();
+      renderEdges();
+      renderDetail();
+      syncControls();
+    }
+
+    function renderAll() {
+      renderLayerFilters();
+      renderDecisionList();
+      renderGraph();
+    }
+
+    function setRightTab(tab, shouldRender = true) {
+      state.rightTab = tab;
+      document.querySelectorAll("[data-right-tab]").forEach(button => button.setAttribute("aria-selected", String(button.dataset.rightTab === tab)));
+      if (shouldRender) renderDetail();
+    }
+
+    function setEdgeMode(mode) {
+      state.edgeMode = mode;
+      reconcileSelection();
+      renderGraph();
+    }
+
+    function syncControls() {
+      document.querySelectorAll("[data-edge-mode]").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.edgeMode === state.edgeMode)));
+      document.querySelector("[data-action='toggle-left']").setAttribute("aria-pressed", String(state.leftOpen));
+      document.querySelector("[data-action='toggle-right']").setAttribute("aria-pressed", String(state.rightOpen));
+      zoomReadout.textContent = `${Math.round(state.scale * 100)}%`;
+    }
+
+    function syncShell() {
+      workspace.classList.toggle("left-collapsed", !state.leftOpen);
+      workspace.classList.toggle("right-collapsed", !state.rightOpen);
+      syncControls();
+      window.setTimeout(() => applyTransform(), 190);
+    }
+
+    function applyTransform() {
+      canvas.style.transform = `translate(${state.tx}px, ${state.ty}px) scale(${state.scale})`;
+      zoomReadout.textContent = `${Math.round(state.scale * 100)}%`;
+    }
+
+    function fitMap() {
+      const rect = viewport.getBoundingClientRect();
+      const padding = window.innerWidth < 540 ? 14 : 28;
+      state.scale = Math.max(0.42, Math.min(1, (rect.width - padding * 2) / canvasSize.width, (rect.height - padding * 2) / canvasSize.height));
+      state.tx = (rect.width - canvasSize.width * state.scale) / 2;
+      state.ty = (rect.height - canvasSize.height * state.scale) / 2;
+      applyTransform();
+    }
+
+    function zoomBy(multiplier) {
+      const rect = viewport.getBoundingClientRect();
+      const next = Math.min(1.6, Math.max(0.38, state.scale * multiplier));
+      const worldX = (rect.width / 2 - state.tx) / state.scale;
+      const worldY = (rect.height / 2 - state.ty) / state.scale;
+      state.scale = next;
+      state.tx = rect.width / 2 - worldX * next;
+      state.ty = rect.height / 2 - worldY * next;
+      applyTransform();
+    }
+
+    function resetView() {
+      state.scale = 1;
+      state.tx = 18;
+      state.ty = 18;
+      applyTransform();
+    }
+
+    function exportJson() {
+      const payload = {
+        ...model,
+        meta: { ...model.meta },
+        decisions: model.decisions.map(decision => ({ ...decision, status: state.teamState.decisionStatus[decision.id] || decision.status })),
+        teamState: state.teamState
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = "decision-map-state.json";
+      document.body.append(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+      showToast("JSON export prepared.");
+    }
+
+    document.querySelectorAll("[data-edge-mode]").forEach(button => button.addEventListener("click", () => setEdgeMode(button.dataset.edgeMode)));
+    document.querySelectorAll("[data-right-tab]").forEach(button => button.addEventListener("click", () => setRightTab(button.dataset.rightTab)));
+
+    searchInput.addEventListener("input", () => {
+      state.query = searchInput.value.trim().toLowerCase();
+      reconcileSelection();
+      renderGraph();
+    });
+
+    document.querySelector("[data-action='toggle-left']").addEventListener("click", () => { state.leftOpen = !state.leftOpen; syncShell(); });
+    document.querySelector("[data-action='toggle-right']").addEventListener("click", () => { state.rightOpen = !state.rightOpen; syncShell(); });
+    document.querySelector("[data-action='close-left']").addEventListener("click", () => { state.leftOpen = false; syncShell(); });
+    document.querySelector("[data-action='close-right']").addEventListener("click", () => { state.rightOpen = false; syncShell(); });
+    document.querySelector("[data-action='fit']").addEventListener("click", fitMap);
+    document.querySelector("[data-action='zoom-in']").addEventListener("click", () => zoomBy(1.16));
+    document.querySelector("[data-action='zoom-out']").addEventListener("click", () => zoomBy(0.86));
+    document.querySelector("[data-action='reset-view']").addEventListener("click", resetView);
+    document.querySelector("[data-action='export']").addEventListener("click", exportJson);
+
+    viewport.addEventListener("click", event => {
+      if (event.target === viewport || event.target === canvas) {
+        state.selectedNode = null;
+        state.selectedEdge = null;
+        renderGraph();
+      }
+    });
+
+    viewport.addEventListener("pointerdown", event => {
+      if (event.target.closest("button") || event.target.closest(".edge")) return;
+      dragState = { id: event.pointerId, x: event.clientX, y: event.clientY, tx: state.tx, ty: state.ty };
+      viewport.setPointerCapture(event.pointerId);
+      viewport.classList.add("is-dragging");
+    });
+
+    viewport.addEventListener("pointermove", event => {
+      if (!dragState || dragState.id !== event.pointerId) return;
+      state.tx = dragState.tx + event.clientX - dragState.x;
+      state.ty = dragState.ty + event.clientY - dragState.y;
+      applyTransform();
+    });
+
+    function endDrag(event) {
+      if (!dragState || dragState.id !== event.pointerId) return;
+      dragState = null;
+      viewport.classList.remove("is-dragging");
+    }
+
+    viewport.addEventListener("pointerup", endDrag);
+    viewport.addEventListener("pointercancel", endDrag);
+
+    viewport.addEventListener("wheel", event => {
+      if (!event.ctrlKey && !event.metaKey) return;
+      event.preventDefault();
+      zoomBy(event.deltaY < 0 ? 1.08 : 0.92);
+    }, { passive: false });
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth <= 860) {
+        state.leftOpen = false;
+        state.rightOpen = false;
+        syncShell();
+      }
+      fitMap();
+    });
+
+    document.querySelector("[data-review-count]").textContent = model.reviews.length;
+    document.querySelector("[data-map-title]").textContent = model.meta.title;
+    document.querySelector("[data-map-question]").textContent = model.meta.firstViewportQuestion;
+    syncShell();
+    renderAll();
+    window.setTimeout(fitMap, 80);
+    window.__decisionMap = { model, state, renderAll, fitMap };
   </script>
 </body>
 </html>

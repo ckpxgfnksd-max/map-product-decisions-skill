@@ -149,7 +149,7 @@ for (const match of setItemMatches) {
   }
 }
 
-if (/pointer-events\s*:\s*none/.test(html) && !/\.edge-path[\s\S]{0,160}pointer-events\s*:\s*(stroke|auto)/.test(html)) {
+if (/(?:svg\.edges|\.edges)[^{]*{[^}]*pointer-events\s*:\s*none/.test(html)) {
   warn("Check SVG edge pointer-events. Parent layers can make edge clicks fail.");
 }
 
@@ -169,8 +169,24 @@ if (!/(data-left-panel|collapse-left|collapsed)/.test(html) || !/(data-detail-pa
   warn("Panel collapse controls or panel markers not found.");
 }
 
-if (/\b(card|panel)[^{}]*{[^{}]*border-radius:\s*(1[0-9]|[2-9][0-9])px/.test(html)) {
-  warn("Large rounded corners found. Guizang Swiss maps should stay rectangular.");
+if (/\b(card|panel|node)[^{}]*{[^{}]*border-radius:\s*(1[7-9]|[2-9][0-9])px/.test(html)) {
+  warn("Oversized card/panel radius found. Night Signal uses 12–14px information surfaces.");
+}
+
+for (const token of ["--surface", "--surface-raised", "--ink", "--muted", "--line", "--accent", "--focus"]) {
+  if (!html.includes(token)) warn(`Semantic UI token not found: ${token}`);
+}
+
+if (!/:focus-visible/.test(html)) {
+  warn("No :focus-visible state found for interactive controls.");
+}
+
+if (!/prefers-reduced-motion/.test(html)) {
+  warn("No prefers-reduced-motion handling found.");
+}
+
+if (/--(?:base|surface)\s*:\s*(?:#000(?:000)?\b|black\b)/i.test(html)) {
+  warn("Pure black surface found. Night Signal uses tinted dark neutrals.");
 }
 
 if (/linear-gradient\([^)]*purple|#8b5cf6|#7c3aed|#a855f7/i.test(html)) {
