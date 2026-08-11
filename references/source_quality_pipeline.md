@@ -71,6 +71,17 @@ decisionLedger: [
 The visible UI can render this as a compact "Decision Log" tab or panel. Keep it
 editable only when the artifact already supports persisted local decision state.
 
+Treat accepted decisions as append-only history. A later change creates a new
+decision with `supersedes`; it does not rewrite the old rationale. Keep
+unresolved blocking concerns visible and separate from ordinary notes so a lack
+of comments cannot be mistaken for agreement.
+
+`localStorage` is a personal draft cache, not a collaboration database. When
+state moves between people or revisions, export a versioned envelope with
+`schemaVersion`, `modelVersion`, `baseRevision`, `exportedAt`, and append-only
+events. Imports with a stale or different base revision must stop for comparison
+instead of silently replacing state.
+
 ## Quality Lint
 
 Run this pass before finalizing text in the artifact:

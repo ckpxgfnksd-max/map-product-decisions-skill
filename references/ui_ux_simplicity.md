@@ -110,10 +110,15 @@ do the same:
 - Double click may be a shortcut but cannot be the only path.
 - Hover can preview. Selection must persist until changed or cleared.
 - Keyboard focus must be visible.
+- Keyboard users must be able to inspect every relationship. When SVG edges are
+  hidden from the accessibility tree, render an equivalent relation list from
+  the same model.
 - Hidden filtered edges should not remain clickable.
 - If filters, search, tabs, or collapsed panels hide the selected item, clear
   the selection or intentionally keep it visible as a focused exception.
 - Export, reset, and destructive actions need explicit labels or confirmation.
+- Treat browser persistence as a personal draft. Use versioned Import/Export
+  JSON for cross-person exchange and surface base-revision conflicts.
 
 ## Copy Rules
 
@@ -141,6 +146,10 @@ Apply baseline design-system behavior:
 - reduced-motion mode disables decorative transitions;
 - color contrast remains legible in selected, muted, warning, and disabled
   states.
+- graph nodes expose accessible names and selected state; disclosures expose
+  `aria-expanded` and work with Enter/Space;
+- meaningful targets are at least 24 by 24 CSS pixels or have equivalent
+  spacing.
 
 ## Visual Style Adapter
 

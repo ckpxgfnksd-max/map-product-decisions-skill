@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Decision Map Seed</title>
+  <title>X Content Learning Loop</title>
   <style>
     :root {
       --paper:#fafaf8; --ink:#0a0a0a; --grey-1:#f0f0ee; --grey-2:#d4d4d2;
@@ -130,76 +130,818 @@
   </div>
 
   <script type="application/json" id="decision-map-model">
-  {
-    "meta": {
-      "title": "Decision Map Seed",
-      "decisionQuestion": "Which evidence and constraint must be resolved before we commit to release?",
-      "schemaVersion": 2,
-      "modelVersion": "seed-2.0.0",
-      "baseRevision": "seed-2026-08-11",
-      "mapGrammar": "dependency-graph",
-      "generatedAt": "2026-08-11",
-      "audience": "Cross-functional product review",
-      "decisionHorizon": "Next release"
+{
+  "meta": {
+    "title": "X Content Learning Loop",
+    "decisionQuestion": "Which feedback may change the next round without bypassing human authority or safety gates?",
+    "schemaVersion": 2,
+    "modelVersion": "1.0.0",
+    "baseRevision": "public-sample-2026-08-11",
+    "mapGrammar": "system-loop-map",
+    "generatedAt": "2026-08-11",
+    "audience": "Beginner product and automation teams",
+    "decisionHorizon": "Before enabling bounded autonomy"
+  },
+  "sources": [
+    {
+      "id": "source-public-synthesis",
+      "label": "Sanitized X workflow synthesis",
+      "type": "first-party-pattern",
+      "status": "simulated-public-example",
+      "claims": [
+        "Content loops need feedback, authority, receipts, and rollback"
+      ],
+      "vocabulary": [
+        "Observe",
+        "Autonomy gate",
+        "Receipts",
+        "Rollback",
+        "Policy store"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "observe",
+      "title": "Observe",
+      "layer": "loop",
+      "priority": "now",
+      "maturity": "validated",
+      "owner": "research",
+      "summary": "Collect candidate topics and context without deciding what to publish.",
+      "decisions": [
+        "Keep collection separate from publishing authority"
+      ],
+      "risks": [
+        "A noisy source can dominate the queue"
+      ],
+      "interfaces": [
+        "Candidate packet"
+      ],
+      "openQuestions": [
+        "What counts as stale?"
+      ],
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "x": 40,
+      "y": 290
     },
-    "sources": [
-      {
-        "id": "source-brief",
-        "label": "Example product brief",
-        "type": "brief",
-        "status": "provided",
-        "claims": ["Customer problem", "Success signal", "Delivery constraint"],
-        "vocabulary": ["Customer problem", "Success signal", "Release decision"]
-      }
-    ],
-    "nodes": [
-      {
-        "id": "customer-problem", "title": "Customer problem", "layer": "product", "priority": "now", "maturity": "validated", "owner": "product", "summary": "The user outcome that gives the release a reason to exist.",
-        "decisions": ["Keep the problem statement stable while testing options"], "risks": ["A solution-first team can optimize the wrong behavior"], "interfaces": ["Problem statement"], "openQuestions": [], "sourceRefs": ["source-brief"], "x": 60, "y": 90
-      },
-      {
-        "id": "success-signal", "title": "Success signal", "layer": "evidence", "priority": "now", "maturity": "design", "owner": "data", "summary": "The observable change that would count as evidence of progress.",
-        "decisions": ["Measure behavior, not feature completion"], "risks": ["A proxy metric may reward the wrong outcome"], "interfaces": ["Metric definition"], "openQuestions": ["What is the baseline?"], "sourceRefs": ["source-brief"], "x": 60, "y": 290
-      },
-      {
-        "id": "product-option", "title": "Product option", "layer": "product", "priority": "next", "maturity": "prototype", "owner": "design", "summary": "The smallest product change that could move the success signal.",
-        "decisions": ["Prototype before committing the platform"], "risks": ["The option may hide operational work"], "interfaces": ["User flow"], "openQuestions": ["Which part is reversible?"], "sourceRefs": ["source-brief"], "x": 330, "y": 90
-      },
-      {
-        "id": "delivery-constraint", "title": "Delivery constraint", "layer": "engineering", "priority": "now", "maturity": "validated", "owner": "engineering", "summary": "The hard technical or operating boundary that narrows the option space.",
-        "decisions": ["Expose the constraint before estimating"], "risks": ["Late discovery turns a two-way choice into a rewrite"], "interfaces": ["Delivery contract"], "openQuestions": [], "sourceRefs": ["source-brief"], "x": 330, "y": 290
-      },
-      {
-        "id": "release-decision", "title": "Release decision", "layer": "decision", "priority": "now", "maturity": "proposed", "owner": "product lead", "summary": "The explicit commitment the review is trying to make.",
-        "decisions": ["Choose an option only after evidence and constraint are visible"], "risks": ["Silence can be mistaken for agreement"], "interfaces": ["Decision record"], "openQuestions": ["Who approves?"], "sourceRefs": ["source-brief"], "x": 620, "y": 190
-      },
-      {
-        "id": "learning-review", "title": "Learning review", "layer": "operations", "priority": "later", "maturity": "design", "owner": "product ops", "summary": "The review that compares the shipped outcome with the original decision.",
-        "decisions": ["Revisit the decision when the success signal contradicts it"], "risks": ["Without a revisit trigger, stale decisions become doctrine"], "interfaces": ["Decision event log"], "openQuestions": ["When is evidence strong enough to supersede?"], "sourceRefs": ["source-brief"], "x": 890, "y": 190
-      }
-    ],
-    "edges": [
-      {"id":"problem-enables-option","from":"customer-problem","to":"product-option","type":"enables","label":"defines outcome","strength":"high","impact":"The problem bounds which option is relevant.","ifRemoved":"Options become feature ideas without a user outcome.","sourceRefs":["source-brief"],"primary":true},
-      {"id":"signal-constrains-option","from":"success-signal","to":"product-option","type":"constrains","label":"must be measurable","strength":"high","impact":"The option must create an observable success signal.","ifRemoved":"The team cannot tell whether the option worked.","sourceRefs":["source-brief"],"primary":false},
-      {"id":"constraint-constrains-option","from":"delivery-constraint","to":"product-option","type":"constrains","label":"narrows scope","strength":"high","impact":"The delivery boundary removes infeasible variants.","ifRemoved":"The chosen option may require an unplanned rewrite.","sourceRefs":["source-brief"],"primary":true},
-      {"id":"option-feeds-decision","from":"product-option","to":"release-decision","type":"feeds","label":"candidate","strength":"high","impact":"The option is one input to the release decision.","ifRemoved":"The decision has no concrete action attached.","sourceRefs":["source-brief"],"primary":true},
-      {"id":"constraint-gates-decision","from":"delivery-constraint","to":"release-decision","type":"gates","label":"feasibility gate","strength":"high","impact":"The release cannot be accepted until the constraint is resolved.","ifRemoved":"The decision can silently commit impossible work.","sourceRefs":["source-brief"],"primary":true},
-      {"id":"signal-gates-decision","from":"success-signal","to":"release-decision","type":"gates","label":"evidence gate","strength":"medium","impact":"The decision needs a testable outcome.","ifRemoved":"Shipping becomes the only definition of success.","sourceRefs":["source-brief"],"primary":true},
-      {"id":"decision-enables-review","from":"release-decision","to":"learning-review","type":"enables","label":"creates baseline","strength":"medium","impact":"A recorded decision gives the later review something to compare against.","ifRemoved":"The review cannot reconstruct the original rationale.","sourceRefs":["source-brief"],"primary":true}
-    ],
-    "decisions": [
-      {
-        "id":"choose-release-option","title":"Choose the smallest testable release option","status":"proposed","priority":"now","reversibility":"costly","affects":["product-option","delivery-constraint","release-decision"],
-        "context":"The team needs to commit without hiding evidence or delivery constraints.","options":["Prototype only","Limited release","Full release"],"rationale":"Prefer the smallest option that can move the success signal.","tradeoffs":["Faster learning versus less short-term reach"],"consequences":["A learning review is required after release"],"confidence":"medium","driver":"product lead","reviewers":["engineering","data"],"approvers":["product lead"],"acceptanceCriteria":["Success signal defined","Delivery constraint resolved"],"rollbackPlan":"Stop the release and preserve the decision event log.","sourceRefs":["source-brief"]
-      }
-    ],
-    "reviews": [
-      {"id":"review-product","area":"product","finding":"The release option needs a measurable customer outcome.","severity":"high","linkedNodes":["customer-problem","success-signal","release-decision"],"sourceRefs":["source-brief"]},
-      {"id":"review-engineering","area":"engineering","finding":"The delivery contract must be resolved before approval.","severity":"high","linkedNodes":["delivery-constraint","release-decision"],"sourceRefs":["source-brief"]},
-      {"id":"review-security","area":"security/privacy","finding":"Confirm that the success signal does not require unnecessary personal data.","severity":"medium","linkedNodes":["success-signal"],"sourceRefs":["source-brief"]},
-      {"id":"review-loop","area":"agentic-loop","finding":"Automated recommendations must not silently change an accepted decision.","severity":"medium","linkedNodes":["release-decision","learning-review"],"sourceRefs":["source-brief"]}
-    ]
-  }
+    {
+      "id": "classify",
+      "title": "Classify",
+      "layer": "loop",
+      "priority": "now",
+      "maturity": "design",
+      "owner": "product",
+      "summary": "Choose topic, audience, format, and risk class for the next attempt.",
+      "decisions": [
+        "Route before drafting"
+      ],
+      "risks": [
+        "Classification errors can scale into repeated bad output"
+      ],
+      "interfaces": [
+        "Content brief"
+      ],
+      "openQuestions": [
+        "Which classes require a person?"
+      ],
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "x": 250,
+      "y": 110
+    },
+    {
+      "id": "draft",
+      "title": "Draft",
+      "layer": "loop",
+      "priority": "next",
+      "maturity": "prototype",
+      "owner": "content system",
+      "summary": "Create a bounded candidate, not an irreversible public action.",
+      "decisions": [
+        "Generate alternatives before selecting"
+      ],
+      "risks": [
+        "Fluent output can hide weak evidence"
+      ],
+      "interfaces": [
+        "Draft bundle"
+      ],
+      "openQuestions": [],
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "x": 470,
+      "y": 55
+    },
+    {
+      "id": "verify",
+      "title": "Verify",
+      "layer": "loop",
+      "priority": "now",
+      "maturity": "design",
+      "owner": "quality",
+      "summary": "Check claims, voice, media, policy, and failure conditions.",
+      "decisions": [
+        "Fail closed on unsupported material claims"
+      ],
+      "risks": [
+        "A single aggregate score can hide a critical failure"
+      ],
+      "interfaces": [
+        "Verification receipt"
+      ],
+      "openQuestions": [
+        "Which checks are hard gates?"
+      ],
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "x": 690,
+      "y": 110
+    },
+    {
+      "id": "autonomy-gate",
+      "title": "Autonomy gate",
+      "layer": "control",
+      "priority": "now",
+      "maturity": "proposed",
+      "owner": "product owner",
+      "summary": "Decide whether this action needs approval or fits a pre-authorized envelope.",
+      "decisions": [
+        "Earn autonomy by risk class"
+      ],
+      "risks": [
+        "Silent scope expansion removes human authority"
+      ],
+      "interfaces": [
+        "Approval policy"
+      ],
+      "openQuestions": [
+        "Who can widen the envelope?"
+      ],
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "x": 900,
+      "y": 290
+    },
+    {
+      "id": "publish",
+      "title": "Publish",
+      "layer": "loop",
+      "priority": "later",
+      "maturity": "design",
+      "owner": "publisher",
+      "summary": "Execute the external action only after the gate resolves.",
+      "decisions": [
+        "Attach a receipt to every external action"
+      ],
+      "risks": [
+        "Provider failure can strand scheduled work"
+      ],
+      "interfaces": [
+        "Publish command"
+      ],
+      "openQuestions": [],
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "x": 690,
+      "y": 470
+    },
+    {
+      "id": "measure",
+      "title": "Measure",
+      "layer": "loop",
+      "priority": "next",
+      "maturity": "design",
+      "owner": "analytics",
+      "summary": "Collect outcome signals separately from the system's own confidence.",
+      "decisions": [
+        "Compare against a baseline"
+      ],
+      "risks": [
+        "Fast metrics can reward shallow reactions"
+      ],
+      "interfaces": [
+        "Outcome packet"
+      ],
+      "openQuestions": [
+        "What is the decision window?"
+      ],
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "x": 470,
+      "y": 525
+    },
+    {
+      "id": "learn",
+      "title": "Learn",
+      "layer": "loop",
+      "priority": "next",
+      "maturity": "proposed",
+      "owner": "product learning",
+      "summary": "Propose what should change next; do not directly rewrite accepted policy.",
+      "decisions": [
+        "Learning emits proposals, not authority"
+      ],
+      "risks": [
+        "Self-reinforcement can amplify a bad proxy"
+      ],
+      "interfaces": [
+        "Policy proposal"
+      ],
+      "openQuestions": [
+        "What evidence can supersede policy?"
+      ],
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "x": 250,
+      "y": 470
+    },
+    {
+      "id": "human-review",
+      "title": "Human review",
+      "layer": "control",
+      "priority": "now",
+      "maturity": "validated",
+      "owner": "operator",
+      "summary": "Approves high-risk or out-of-envelope actions and resolves dissent.",
+      "decisions": [
+        "Silence is not approval"
+      ],
+      "risks": [
+        "Review can become a bottleneck without clear thresholds"
+      ],
+      "interfaces": [
+        "Approval event"
+      ],
+      "openQuestions": [],
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "x": 900,
+      "y": 65
+    },
+    {
+      "id": "kill-switch",
+      "title": "Kill switch",
+      "layer": "safety",
+      "priority": "now",
+      "maturity": "validated",
+      "owner": "operator",
+      "summary": "Stops external action without waiting for the learning loop.",
+      "decisions": [
+        "Keep stop authority outside the autonomous path"
+      ],
+      "risks": [
+        "A hidden or slow stop is not a real control"
+      ],
+      "interfaces": [
+        "Stop signal"
+      ],
+      "openQuestions": [],
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "x": 900,
+      "y": 525
+    },
+    {
+      "id": "stale-data-guard",
+      "title": "Stale-data guard",
+      "layer": "safety",
+      "priority": "now",
+      "maturity": "design",
+      "owner": "data",
+      "summary": "Blocks classification when inputs are too old or provenance is missing.",
+      "decisions": [
+        "Prefer an explicit degraded mode over silent freshness loss"
+      ],
+      "risks": [
+        "Healthy infrastructure can still carry stale meaning"
+      ],
+      "interfaces": [
+        "Freshness status"
+      ],
+      "openQuestions": [
+        "When is degraded mode acceptable?"
+      ],
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "x": 40,
+      "y": 65
+    },
+    {
+      "id": "receipts",
+      "title": "Receipts",
+      "layer": "evidence",
+      "priority": "now",
+      "maturity": "design",
+      "owner": "operations",
+      "summary": "Record what was checked, approved, executed, and observed.",
+      "decisions": [
+        "Make every external action reconstructable"
+      ],
+      "risks": [
+        "Logs without stable IDs cannot prove causality"
+      ],
+      "interfaces": [
+        "Action receipt"
+      ],
+      "openQuestions": [],
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "x": 470,
+      "y": 290
+    },
+    {
+      "id": "policy-store",
+      "title": "Policy store",
+      "layer": "control",
+      "priority": "now",
+      "maturity": "design",
+      "owner": "product owner",
+      "summary": "Holds the current autonomy envelope and accepted decision history.",
+      "decisions": [
+        "Accepted policy changes only through a superseding decision"
+      ],
+      "risks": [
+        "Mutable policy erases why the system changed"
+      ],
+      "interfaces": [
+        "Versioned policy"
+      ],
+      "openQuestions": [],
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "x": 250,
+      "y": 290
+    },
+    {
+      "id": "rollback",
+      "title": "Rollback",
+      "layer": "safety",
+      "priority": "now",
+      "maturity": "design",
+      "owner": "operations",
+      "summary": "Restores the last accepted policy or removes a queued external action.",
+      "decisions": [
+        "Test rollback before widening autonomy"
+      ],
+      "risks": [
+        "A rollback plan can fail if receipts are incomplete"
+      ],
+      "interfaces": [
+        "Rollback event"
+      ],
+      "openQuestions": [],
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "x": 40,
+      "y": 525
+    }
+  ],
+  "edges": [
+    {
+      "id": "observe-feeds-classify",
+      "from": "observe",
+      "to": "classify",
+      "type": "feeds",
+      "label": "candidate packet",
+      "strength": "high",
+      "impact": "Fresh observations give classification something current to act on.",
+      "ifRemoved": "The loop drafts from stale memory.",
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "primary": true
+    },
+    {
+      "id": "classify-enables-draft",
+      "from": "classify",
+      "to": "draft",
+      "type": "enables",
+      "label": "content brief",
+      "strength": "high",
+      "impact": "A bounded brief tells drafting what job to perform.",
+      "ifRemoved": "Drafting becomes an unscoped text generator.",
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "primary": true
+    },
+    {
+      "id": "draft-feeds-verify",
+      "from": "draft",
+      "to": "verify",
+      "type": "feeds",
+      "label": "candidate bundle",
+      "strength": "high",
+      "impact": "Verification evaluates a concrete candidate.",
+      "ifRemoved": "There is no inspectable object to approve.",
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "primary": true
+    },
+    {
+      "id": "verify-gates-autonomy",
+      "from": "verify",
+      "to": "autonomy-gate",
+      "type": "gates",
+      "label": "verification receipt",
+      "strength": "high",
+      "impact": "The autonomy gate needs explicit quality and safety results.",
+      "ifRemoved": "Fluent output can pass without evidence.",
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "primary": true
+    },
+    {
+      "id": "autonomy-gates-publish",
+      "from": "autonomy-gate",
+      "to": "publish",
+      "type": "gates",
+      "label": "authority",
+      "strength": "high",
+      "impact": "Publishing requires approval or a matching pre-authorized envelope.",
+      "ifRemoved": "The system can widen its own authority.",
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "primary": true
+    },
+    {
+      "id": "publish-enables-measure",
+      "from": "publish",
+      "to": "measure",
+      "type": "enables",
+      "label": "observable outcome",
+      "strength": "high",
+      "impact": "Only an executed action can produce external outcome signals.",
+      "ifRemoved": "The learning loop optimizes simulations.",
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "primary": true
+    },
+    {
+      "id": "measure-feeds-learn",
+      "from": "measure",
+      "to": "learn",
+      "type": "feeds",
+      "label": "outcome packet",
+      "strength": "high",
+      "impact": "Measured outcomes ground learning proposals.",
+      "ifRemoved": "Learning follows the model's opinion of itself.",
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "primary": true
+    },
+    {
+      "id": "learn-feeds-classify",
+      "from": "learn",
+      "to": "classify",
+      "type": "enables",
+      "label": "next-round hypothesis",
+      "strength": "high",
+      "impact": "Learning changes the next classification hypothesis, closing the loop.",
+      "ifRemoved": "The workflow is a pipeline, not a learning system.",
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "primary": true
+    },
+    {
+      "id": "stale-guard-blocks-observe",
+      "from": "stale-data-guard",
+      "to": "observe",
+      "type": "blocks",
+      "label": "freshness check",
+      "strength": "high",
+      "impact": "Stale or untraceable inputs stop the loop before selection.",
+      "ifRemoved": "The system can confidently act on expired context.",
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "primary": false
+    },
+    {
+      "id": "human-gates-autonomy",
+      "from": "human-review",
+      "to": "autonomy-gate",
+      "type": "gates",
+      "label": "explicit approval",
+      "strength": "high",
+      "impact": "High-risk actions require an affirmative human event.",
+      "ifRemoved": "Silence can be interpreted as consent.",
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "primary": true
+    },
+    {
+      "id": "kill-switch-blocks-publish",
+      "from": "kill-switch",
+      "to": "publish",
+      "type": "blocks",
+      "label": "stop signal",
+      "strength": "high",
+      "impact": "The operator can stop execution outside the loop's normal cadence.",
+      "ifRemoved": "The system has no reliable emergency brake.",
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "primary": true
+    },
+    {
+      "id": "publish-feeds-receipts",
+      "from": "publish",
+      "to": "receipts",
+      "type": "feeds",
+      "label": "execution receipt",
+      "strength": "high",
+      "impact": "Every external action becomes reconstructable.",
+      "ifRemoved": "The team cannot prove what actually happened.",
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "primary": false
+    },
+    {
+      "id": "receipts-enable-rollback",
+      "from": "receipts",
+      "to": "rollback",
+      "type": "enables",
+      "label": "recovery evidence",
+      "strength": "high",
+      "impact": "Rollback needs stable IDs and the previous accepted state.",
+      "ifRemoved": "Recovery becomes guesswork.",
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "primary": false
+    },
+    {
+      "id": "rollback-protects-policy",
+      "from": "rollback",
+      "to": "policy-store",
+      "type": "protects",
+      "label": "restore boundary",
+      "strength": "medium",
+      "impact": "Rollback returns the system to the last accepted authority boundary.",
+      "ifRemoved": "A failed experiment can permanently widen authority.",
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "primary": false
+    },
+    {
+      "id": "policy-constrains-classify",
+      "from": "policy-store",
+      "to": "classify",
+      "type": "constrains",
+      "label": "current envelope",
+      "strength": "high",
+      "impact": "Classification must respect the accepted autonomy policy.",
+      "ifRemoved": "The next round can ignore agreed limits.",
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "primary": true
+    },
+    {
+      "id": "learn-feeds-policy",
+      "from": "learn",
+      "to": "policy-store",
+      "type": "feeds",
+      "label": "superseding proposal",
+      "strength": "medium",
+      "impact": "Learning may propose a policy change but cannot accept it.",
+      "ifRemoved": "The loop cannot improve its authority model.",
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "primary": false
+    },
+    {
+      "id": "measure-feeds-receipts",
+      "from": "measure",
+      "to": "receipts",
+      "type": "feeds",
+      "label": "outcome receipt",
+      "strength": "medium",
+      "impact": "Outcome evidence remains tied to the action that caused it.",
+      "ifRemoved": "Metrics lose causal identity.",
+      "sourceRefs": [
+        "source-public-synthesis"
+      ],
+      "primary": false
+    }
+  ],
+  "decisions": [
+    {
+      "id": "choose-autonomy-boundary",
+      "title": "Choose approval-by-default or bounded autonomy by risk class",
+      "status": "proposed",
+      "priority": "now",
+      "reversibility": "costly",
+      "context": "The loop needs speed without giving itself unlimited publishing authority.",
+      "options": [
+        "Approve every action",
+        "Bounded autonomy by risk class",
+        "Full autonomy"
+      ],
+      "rationale": "Start with bounded autonomy and explicit escalation outside the envelope.",
+      "tradeoffs": [
+        "More policy work up front",
+        "Lower review load for routine actions"
+      ],
+      "consequences": [
+        "Every action needs a risk class and authority receipt"
+      ],
+      "confidence": "medium",
+      "driver": "product owner",
+      "reviewers": [
+        "operator",
+        "quality",
+        "security"
+      ],
+      "approvers": [
+        "product owner"
+      ],
+      "acceptanceCriteria": [
+        "Kill switch tested",
+        "Rollback tested",
+        "High-risk class defined"
+      ],
+      "rollbackPlan": "Return all actions to approval-by-default.",
+      "affects": [
+        "autonomy-gate",
+        "human-review",
+        "publish",
+        "policy-store"
+      ],
+      "sourceRefs": [
+        "source-public-synthesis"
+      ]
+    },
+    {
+      "id": "limit-learning-writes",
+      "title": "Allow learning to propose policy changes but not accept them",
+      "status": "proposed",
+      "priority": "now",
+      "reversibility": "two-way",
+      "context": "A self-editing loop can reinforce a bad metric or proxy.",
+      "options": [
+        "Direct write-back",
+        "Proposal plus approval",
+        "No automated learning"
+      ],
+      "rationale": "Separate observation from authority.",
+      "tradeoffs": [
+        "Slower policy change",
+        "Traceable decisions"
+      ],
+      "consequences": [
+        "Policy changes create superseding decisions"
+      ],
+      "confidence": "high",
+      "driver": "product owner",
+      "reviewers": [
+        "analytics",
+        "security"
+      ],
+      "approvers": [
+        "product owner"
+      ],
+      "acceptanceCriteria": [
+        "Proposal event format defined"
+      ],
+      "rollbackPlan": "Disable learning proposals and restore the last accepted policy.",
+      "affects": [
+        "learn",
+        "policy-store",
+        "classify"
+      ],
+      "sourceRefs": [
+        "source-public-synthesis"
+      ]
+    },
+    {
+      "id": "choose-degraded-mode",
+      "title": "Choose fail-closed or labeled degraded mode when evidence is stale",
+      "status": "needs-review",
+      "priority": "next",
+      "reversibility": "two-way",
+      "context": "Inputs and metrics can be missing even when infrastructure appears healthy.",
+      "options": [
+        "Fail closed",
+        "Labeled degraded mode",
+        "Continue silently"
+      ],
+      "rationale": "Never continue silently; choose between the first two by risk class.",
+      "tradeoffs": [
+        "Availability versus evidence quality"
+      ],
+      "consequences": [
+        "Freshness status becomes a gate input"
+      ],
+      "confidence": "medium",
+      "driver": "data owner",
+      "reviewers": [
+        "product owner",
+        "operator"
+      ],
+      "approvers": [
+        "product owner"
+      ],
+      "acceptanceCriteria": [
+        "Freshness threshold defined"
+      ],
+      "rollbackPlan": "Disable degraded mode.",
+      "affects": [
+        "stale-data-guard",
+        "observe",
+        "autonomy-gate"
+      ],
+      "sourceRefs": [
+        "source-public-synthesis"
+      ]
+    }
+  ],
+  "reviews": [
+    {
+      "id": "review-product-boundary",
+      "area": "product",
+      "finding": "The autonomy envelope needs explicit risk classes and decision ownership.",
+      "severity": "high",
+      "linkedNodes": [
+        "autonomy-gate",
+        "policy-store"
+      ],
+      "sourceRefs": [
+        "source-public-synthesis"
+      ]
+    },
+    {
+      "id": "review-engineering-receipts",
+      "area": "engineering",
+      "finding": "Stable action and event IDs are required for metrics, rollback, and audit.",
+      "severity": "high",
+      "linkedNodes": [
+        "publish",
+        "measure",
+        "receipts",
+        "rollback"
+      ],
+      "sourceRefs": [
+        "source-public-synthesis"
+      ]
+    },
+    {
+      "id": "review-security-stop",
+      "area": "security/privacy",
+      "finding": "Stop authority and privacy checks must remain outside the self-modifying loop.",
+      "severity": "high",
+      "linkedNodes": [
+        "verify",
+        "kill-switch",
+        "autonomy-gate"
+      ],
+      "sourceRefs": [
+        "source-public-synthesis"
+      ]
+    },
+    {
+      "id": "review-agentic-policy",
+      "area": "agentic-loop",
+      "finding": "Learning may propose changes, but accepted policy must remain append-only and human-owned.",
+      "severity": "high",
+      "linkedNodes": [
+        "learn",
+        "policy-store",
+        "human-review"
+      ],
+      "sourceRefs": [
+        "source-public-synthesis"
+      ]
+    }
+  ]
+}
   </script>
 
   <script>
